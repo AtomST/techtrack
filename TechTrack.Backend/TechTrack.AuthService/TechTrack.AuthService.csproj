@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Logic\Models\" />
+    <ProjectReference Include="..\TechTrack.Shared\TechTrack.Shared.csproj" />
   </ItemGroup>
 
 </Project>
