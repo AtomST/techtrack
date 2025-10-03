@@ -8,13 +8,11 @@ namespace TechTrack.Shared.Logic
     public class JwtTokenValidator
     {
         private readonly string _issuer;
-        private readonly string _audience;
         private readonly SecurityKey _securityKey;
 
-        public JwtTokenValidator(string issuer, string audience, string key)
+        public JwtTokenValidator(string issuer, string key)
         {
             _issuer = issuer;
-            _audience = audience;
             _securityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key));
         }
 
@@ -26,11 +24,10 @@ namespace TechTrack.Shared.Logic
                 var validationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
-                    ValidateAudience = true,
+                    ValidateAudience = false,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = _issuer,
-                    ValidAudience = _audience,
                     IssuerSigningKey = _securityKey
                 };
 

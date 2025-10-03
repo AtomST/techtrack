@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using TechTrack.Shared.Logic;
-namespace AdBoard.API.Middleware
+namespace TechTrack.Shared.Middleware
 {
     public class JwtAuthenticationMiddleware
     {
