@@ -6,10 +6,11 @@ namespace TechTrack.AuthService.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        [HttpPost]
+        [HttpGet]
+        [Route("index")]
         public IActionResult Login()
         {
-            return Ok();
+            return Ok("HelloWorld");
         }
     }
 }
