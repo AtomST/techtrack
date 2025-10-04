@@ -19,6 +19,7 @@ namespace TechTrack.UserService
             builder.Services.AddScoped<AuthClient>();
             builder.Services.AddControllers();
             var app = builder.Build();
+            app.UseMiddleware<GlobalExceptionHandler>();
 
             // Configure the HTTP request pipeline.
 
