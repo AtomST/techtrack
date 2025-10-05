@@ -32,6 +32,5 @@ services:
       - Jwt__Issuer=http://auth-service
     depends_on:
       - postgres
-      - auth-service
 volumes:
   postgres_data:

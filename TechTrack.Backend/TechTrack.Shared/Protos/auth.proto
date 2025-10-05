@@ -1,0 +1,31 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "TechTrack.Shared.Protos";
+
+package auth;
+
+service AuthService {
+  rpc SayHello (HelloRequest) returns (HelloResponse);
+  rpc SaveUserCredentials(RegisterCredentialsRequest) returns (RegisterCredentialsResponse);
+}
+
+message HelloRequest {
+  string name = 1;
+}
+
+message HelloResponse {
+  string message = 1;
+}
+
+message RegisterCredentialsRequest {
+	string email = 1;
+	string password = 2;
+}
+
+message RegisterCredentialsResponse {
+	string access_token = 1;
+	string refresh_token = 2;
+	int32 status = 3;
+	string message = 4;
+}
+

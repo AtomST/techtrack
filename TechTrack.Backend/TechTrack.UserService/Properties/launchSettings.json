@@ -8,17 +8,12 @@
       "sslPort": 0
     }
   },
-  "Kestrel": {
-    "EndpointDefaults": {
-      "Protocols": "Http2"
-    }
-  },
   "profiles": {
     "http": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
-      "applicationUrl": "https://localhost:8080",
+      "applicationUrl": "http://localhost:8080",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

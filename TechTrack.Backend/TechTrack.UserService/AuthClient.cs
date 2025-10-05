@@ -1,5 +1,5 @@
 ﻿using Grpc.Net.Client;
-using TechTrack.UserService.Protos;
+using TechTrack.Shared.Protos;
 
 namespace TechTrack.UserService
 {
