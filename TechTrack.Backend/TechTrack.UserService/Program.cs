@@ -20,7 +20,7 @@ namespace TechTrack.UserService
             //Add services to the container.
             builder.Services.AddGrpcClient<AuthService.AuthServiceClient>(opt =>
             {
-                opt.Address = new Uri("http://auth-service:8080");
+                opt.Address = new Uri("http://auth-service:8081");
             });
             builder.Services.AddScoped<IUserLogic, UserLogic>();
             builder.Services.AddScoped<AuthClient>();
