@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Grpc.Core;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Net;
@@ -78,13 +79,13 @@ namespace TechTrack.Shared.Middleware
                     result.StatusCode = HttpStatusCode.BadRequest;
                     result.Message = notFoundException.Message;
                     break;
-                }
+                };
                 case UnauthorizedException unauthorizedException:
                 {
                     result.StatusCode = HttpStatusCode.Unauthorized;
                     result.Message = unauthorizedException.Message;
                     break;
-                }
+                };
                 case RecordExistsException recordExistsException:
                 {
                     result.StatusCode = HttpStatusCode.BadRequest;
@@ -96,14 +97,31 @@ namespace TechTrack.Shared.Middleware
                     result.StatusCode = HttpStatusCode.NotFound;
                     result.Message = notFoundException.Message;
                     break;
-                }
-                ;
+                };
+
+
+                case RpcException rpcException:
+                {
+                    result.StatusCode = rpcException.StatusCode switch
+                    {
+                        StatusCode.Unauthenticated => HttpStatusCode.Unauthorized,
+                        StatusCode.InvalidArgument => HttpStatusCode.BadRequest,
+                        StatusCode.NotFound => HttpStatusCode.NotFound,
+                        StatusCode.AlreadyExists => HttpStatusCode.BadRequest,
+                        StatusCode.PermissionDenied => HttpStatusCode.Forbidden,
+                        StatusCode.Unavailable => HttpStatusCode.ServiceUnavailable,
+                        StatusCode.DeadlineExceeded => HttpStatusCode.GatewayTimeout,
+                        _ => HttpStatusCode.InternalServerError
+                    };
+                    result.Message = rpcException.Status.Detail;
+                    break;
+                };
                 case Exception ex:
                 {
                     _logger.LogError(ex.Message);
                     _logger.LogError(ex.StackTrace);
                     break;
-                }
+                };
             }
 
             context.Response.StatusCode = (int)result.StatusCode;
