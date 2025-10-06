@@ -19,9 +19,5 @@
   <ItemGroup>
     <ProjectReference Include="..\TechTrack.Shared\TechTrack.Shared.csproj" />
   </ItemGroup>
-	
-  <ItemGroup>
-    <Folder Include="Models\Responses\" />
-  </ItemGroup>
 
 </Project>

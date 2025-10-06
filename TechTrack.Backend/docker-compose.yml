@@ -1,26 +1,39 @@
 version: '3.8'
 services:
-  postgres:
-    image: postgres:latest
+  postgres-auth:
+    image: postgres:15
     environment:
-      POSTGRES_USER: admin
+      POSTGRES_DB: auth_service
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: admin
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_auth_data:/var/lib/postgresql/data
     ports:
-      - "5432:5080"
+      - "5432:5432"
+
+  postgres-user:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: user_service
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    volumes:
+      - postgres_user_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
 
   auth-service:
     build:
       context: .
       dockerfile: TechTrack.AuthService/Dockerfile
     ports:
-      - "5000:8080"
+      - "5000:8080" # REST(HTTP/1.1)
+      - "5002:8081" # gRPC(HTTP/2)
     environment:
-      - ConnectionStrings__AuthServiceDbConnection=Host=postgres;Database=TechTrack_Auth;Username=postgres;Password=admin
+      - ConnectionStrings__AuthServiceDbConnection=Host=postgres-auth;Database=auth_service;Username=postgres;Password=admin
       - Jwt__Issuer=http://auth-service
     depends_on:
-      - postgres
+      - postgres-auth
 
   user-service:
     build:
@@ -29,8 +42,11 @@ services:
     ports:
       - "5001:8080"
     environment:
-      - Jwt__Issuer=http://auth-service
+      - ConnectionStrings__UserServiceDbConnection=Host=postgres-user;Database=user_service;Username=postgres;Password=admin
+      - Jwt__Issuer=http://auth-service:5001
+      - Jwt__AccessTokenKey=5c6dd372771c07a19980ce9ad6f251f3ea8f9974a85a943152a68906a2708f7d
     depends_on:
-      - postgres
+      - postgres-user
 volumes:
-  postgres_data:
+  postgres_auth_data:
+  postgres_user_data:

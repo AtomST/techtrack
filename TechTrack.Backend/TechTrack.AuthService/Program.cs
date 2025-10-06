@@ -19,7 +19,6 @@ namespace TechTrack.AuthService
             builder.Services.AddGrpc();
             var app = builder.Build();
             app.MapGrpcService<AuthGrpcLogic>();
-            app.UseMiddleware<GlobalExceptionHandler>();
             app.MapControllers();
             app.Run();
         }

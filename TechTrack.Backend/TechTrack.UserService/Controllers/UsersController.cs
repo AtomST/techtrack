@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using TechTrack.Shared.Responses;
+using System.Net;
+using TechTrack.UserService.Logic.Interfaces;
+using TechTrack.UserService.Models.Requests;
 
 namespace TechTrack.UserService.Controllers
 {
@@ -7,16 +10,56 @@ namespace TechTrack.UserService.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly AuthClient _client;
-        public UsersController(AuthClient client)
+        private readonly IUserLogic _userLogic;
+        private readonly string AUTH_COOKIE_NAME = "techtrack_refresh_token";
+        public UsersController(IUserLogic userLogic, IConfiguration configuration)
         {
-            _client = client;
+            _userLogic = userLogic;
+            AUTH_COOKIE_NAME = configuration["Security:AuthHttpOnlyCookieName"];
+        }
+        [HttpGet("exception")]
+        public async Task<IActionResult> Exc()
+        {
+            throw new NotImplementedException();
         }
         [HttpGet("{name}")]
         public async Task<IActionResult> Test(string name)
         {
-            var response = await _client.SayHelloAsync(name);
-            return Ok(response);
+            return Ok();
         }
+
+        [HttpPost]
+        public async Task<IActionResult> Register([FromBody] RegisterDto dto)
+        {
+            var result = await _userLogic.Register(dto);
+
+            try
+            {
+                Cookie cookie = new Cookie
+                {
+                    Name = AUTH_COOKIE_NAME,
+                    Value = result.RefreshToken,
+                    Expires = result.RefreshTokenExpiredAt,
+                    HttpOnly = true
+                };
+                Response.Cookies.Append(cookie.Name, cookie.Value, new CookieOptions { Expires = cookie.Expires, HttpOnly = true });
+
+
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            return Created("users", new SuccessResponse()
+            {
+                StatusCode = HttpStatusCode.Created,
+                Data = new 
+                {
+                    accessToken = result.AccessToken
+                }
+            });
+        }
+        
     }
 }
