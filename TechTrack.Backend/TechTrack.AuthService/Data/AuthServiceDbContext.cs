@@ -23,14 +23,52 @@ namespace TechTrack.AuthService.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<UserCredentials>()
-                .HasMany(u => u.RefreshTokens)
-                .WithOne(r => r.UserCredentials)
-                .HasForeignKey(r => r.UserId);
 
-            modelBuilder.Entity<RefreshToken>()
-                .HasIndex(r => r.Token)
-                .IsUnique();
+
+            modelBuilder.Entity<UserCredentials>(entity =>
+            {
+                entity.ToTable("user_credentials");
+
+                entity.HasKey(x => x.Id);
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("id")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.Email)
+                    .HasColumnName("email");
+                entity.Property(e => e.Password)
+                    .HasColumnName("password");
+
+                entity
+                    .HasMany(u => u.RefreshTokens)
+                    .WithOne(r => r.UserCredentials)
+                    .HasForeignKey(r => r.UserId);
+            });
+
+
+            modelBuilder.Entity<RefreshToken>(entity =>
+            {
+                entity.ToTable("refresh_tokens");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("id");
+
+                entity.Property(e => e.Token)
+                    .HasColumnName("token");
+
+                entity.Property(e => e.ExpiredAt)
+                    .HasColumnName("expired_at")
+                    .HasColumnType("timestamp with time zone")
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                entity.Property(e => e.UserId)
+                    .HasColumnName("user_id");
+
+                entity
+                    .HasIndex(e => e.Token)
+                    .IsUnique();
+            });
         }
     }
 }

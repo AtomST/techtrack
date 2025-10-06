@@ -1,4 +1,6 @@
-﻿namespace TechTrack.AuthService.Data.Entities
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace TechTrack.AuthService.Data.Entities
 {
     public class RefreshToken
     {
