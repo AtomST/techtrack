@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -9,7 +10,6 @@ namespace TechTrack.Shared.Logic
     {
         private readonly string _issuer;
         private readonly SecurityKey _securityKey;
-
         public JwtTokenValidator(string issuer, string key)
         {
             _issuer = issuer;
@@ -23,11 +23,9 @@ namespace TechTrack.Shared.Logic
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var validationParameters = new TokenValidationParameters
                 {
-                    ValidateIssuer = true,
+                    ValidateIssuer = false,
                     ValidateAudience = false,
-                    ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = _issuer,
                     IssuerSigningKey = _securityKey
                 };
 

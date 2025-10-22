@@ -13,11 +13,11 @@ namespace TechTrack.UserService
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            //builder.Services.AddSingleton(new JwtTokenValidator
-            //    (
-            //        builder.Configuration["Jwt:Issuer"],
-            //        builder.Configuration["Jwt:AccessTokenKey"]
-            //    ));
+            builder.Services.AddSingleton(new JwtTokenValidator
+                (
+                    builder.Configuration["Jwt:Issuer"],
+                    builder.Configuration["Jwt:AccessTokenKey"]
+                ));
             //Add services to the container.
             builder.Services.AddGrpcClient<AuthService.AuthServiceClient>(opt =>
             {
@@ -33,7 +33,7 @@ namespace TechTrack.UserService
             // Configure the HTTP request pipeline.
 
             app.UseAuthorization();
-            //app.UseMiddleware<JwtAuthenticationMiddleware>();
+            app.UseMiddleware<JwtAuthenticationMiddleware>();
 
             app.MapControllers();
 

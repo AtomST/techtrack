@@ -60,6 +60,12 @@ namespace TechTrack.UserService.Controllers
                 }
             });
         }
+
+        [HttpGet("secured")]
+        public async Task<IActionResult> Secured()
+        {
+            return Ok(User.FindFirst(w => w.Type == "id").Value);
+        }
         
     }
 }

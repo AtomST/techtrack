@@ -12,7 +12,7 @@ namespace TechTrack.Shared.Middleware
             _next = next;
         }
 
-        public async Task Invoke(HttpContext context, JwtTokenValidator jwtService, string accessToken)
+        public async Task Invoke(HttpContext context, JwtTokenValidator jwtService)
         {
             var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
             if(!string.IsNullOrEmpty(token))

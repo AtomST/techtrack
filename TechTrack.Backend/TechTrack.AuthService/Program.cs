@@ -14,6 +14,7 @@ namespace TechTrack.AuthService
 
             builder.Services.AddDbContext<AuthServiceDbContext>();
             builder.Services.AddScoped<IJwtLogic, JwtLogic>();
+            builder.Services.AddScoped<IAuthLogic, AuthLogic>();
             builder.Services.AddControllers();
             builder.Services.Configure<SecurityOptions>(builder.Configuration.GetSection("Security"));
             builder.Services.AddGrpc();
