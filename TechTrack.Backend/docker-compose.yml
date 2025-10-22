@@ -1,5 +1,12 @@
 version: '3.8'
 services:
+  api-gateway:
+    build:
+      context: .
+      dockerfile: TechTrack.ApiGateway/Dockerfile
+    ports:
+      - "8080:8080"
+
   postgres-auth:
     image: postgres:15
     environment:
@@ -27,8 +34,8 @@ services:
       context: .
       dockerfile: TechTrack.AuthService/Dockerfile
     ports:
-      - "5000:8080" # REST(HTTP/1.1)
-      - "5002:8081" # gRPC(HTTP/2)
+      - "8080" # REST(HTTP/1.1)
+      - "8081" # gRPC(HTTP/2)
     environment:
       - ConnectionStrings__AuthServiceDbConnection=Host=postgres-auth;Database=auth_service;Username=postgres;Password=admin
       - Jwt__Issuer=http://auth-service
@@ -40,7 +47,7 @@ services:
       context: .
       dockerfile: TechTrack.UserService/Dockerfile
     ports:
-      - "5001:8080"
+      - "8080"
     environment:
       - ConnectionStrings__UserServiceDbConnection=Host=postgres-user;Database=user_service;Username=postgres;Password=admin
       - Jwt__Issuer=http://auth-service:8080

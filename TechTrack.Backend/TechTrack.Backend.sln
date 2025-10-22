@@ -14,6 +14,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TechTrack.Shared", "TechTra
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TechTrack.UserService", "TechTrack.UserService\TechTrack.UserService.csproj", "{10FFC9DC-A24F-45EB-B820-C05E124AF7C9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TechTrack.ApiGateway", "TechTrack.ApiGateway\TechTrack.ApiGateway.csproj", "{23A7D788-A0A0-42F5-91F5-0506CF22C55F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{854177A7-014D-433D-9BC1-96A10D821835} = {854177A7-014D-433D-9BC1-96A10D821835}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,6 +41,10 @@ Global
 		{10FFC9DC-A24F-45EB-B820-C05E124AF7C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{10FFC9DC-A24F-45EB-B820-C05E124AF7C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{10FFC9DC-A24F-45EB-B820-C05E124AF7C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{23A7D788-A0A0-42F5-91F5-0506CF22C55F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23A7D788-A0A0-42F5-91F5-0506CF22C55F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23A7D788-A0A0-42F5-91F5-0506CF22C55F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23A7D788-A0A0-42F5-91F5-0506CF22C55F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
