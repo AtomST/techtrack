@@ -18,11 +18,15 @@ namespace TechTrack.UserService
                     builder.Configuration["Jwt:Issuer"],
                     builder.Configuration["Jwt:AccessTokenKey"]
                 ));
+
+            builder.Services.AddTransient<GrpcErrorInterceptor>();
+
             //Add services to the container.
             builder.Services.AddGrpcClient<AuthService.AuthServiceClient>(opt =>
             {
                 opt.Address = new Uri("http://auth-service:8081");
-            });
+            }).AddInterceptor<GrpcErrorInterceptor>();
+
             builder.Services.AddDbContext<UserServiceDbContext>();
             builder.Services.AddScoped<IUserLogic, UserLogic>();
             builder.Services.AddScoped<AuthClient>();
