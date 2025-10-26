@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TechTrack.AuthService.Logic.Interfaces;
 using TechTrack.AuthService.Logic.Models;
+using TechTrack.Shared.Exceptions;
 using TechTrack.Shared.Responses;
 
 namespace TechTrack.AuthService.Controllers
@@ -20,17 +21,9 @@ namespace TechTrack.AuthService.Controllers
         [Route("login")]
         public async Task<IActionResult> Login(LoginDto loginDto)
         {
-            var response = await _authLogic.Login(loginDto);
-            Response.Cookies.Append
-            (
-                AUTH_COOKIE_NAME, 
-                response.RefreshToken, 
-                new CookieOptions() 
-                    { 
-                        Expires = response.RefreshTokenExpiredAt, 
-                        HttpOnly = true 
-                }
-            );
+            var response = await _authLogic.LoginAsync(loginDto);
+
+            SetRefreshToken(Response.Cookies, response.RefreshToken, response.RefreshTokenExpiredAt);
 
             return Ok(new SuccessResponse()
             {
@@ -40,6 +33,42 @@ namespace TechTrack.AuthService.Controllers
                     accessToken = response.AccessToken,
                 }
             });
+        }
+
+        [HttpPost]
+        [Route("refresh")]
+        public async Task<IActionResult> Refresh()
+        {
+            var refreshToken = Request.Cookies.FirstOrDefault(c => c.Key == AUTH_COOKIE_NAME).Value;
+            if (string.IsNullOrEmpty(refreshToken))
+                throw new UnauthorizedException("Refresh токен отсутствует. Необходима аутентификация");
+
+            var response = await _authLogic.RefreshAsync(refreshToken);
+
+            SetRefreshToken(Response.Cookies, response.RefreshToken, response.RefreshTokenExpiredAt);
+
+            return Ok(new SuccessResponse()
+            {
+                StatusCode = System.Net.HttpStatusCode.OK,
+                Data = new
+                {
+                    accessToken = response.AccessToken,
+                }
+            });
+        }
+
+        private void SetRefreshToken(IResponseCookies cookies, string refreshToken, DateTime refreshTokenExpiredAt)
+        {
+            cookies.Append
+            (
+                AUTH_COOKIE_NAME,
+                refreshToken,
+                new CookieOptions()
+                {
+                    Expires = refreshTokenExpiredAt,
+                    HttpOnly = true
+                }
+            );
         }
     }
 }

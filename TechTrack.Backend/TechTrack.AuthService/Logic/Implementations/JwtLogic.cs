@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using TechTrack.Shared.Protos;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;

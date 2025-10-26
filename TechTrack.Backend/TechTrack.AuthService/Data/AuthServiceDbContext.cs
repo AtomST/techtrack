@@ -12,6 +12,7 @@ namespace TechTrack.AuthService.Data
         }
 
         public DbSet<UserCredentials> UserCredentials { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

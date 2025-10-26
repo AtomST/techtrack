@@ -12,14 +12,16 @@ namespace TechTrack.AuthService.Logic.Implementations
     {
         private readonly AuthServiceDbContext _dbContext;
         private readonly SecurityOptions _securityOptions;
+        private readonly ILogger<IAuthLogic> _logger;
         private readonly IJwtLogic _jwtLogic;
-        public AuthLogic(AuthServiceDbContext dbContext, IJwtLogic jwtLogic, IOptions<SecurityOptions> options)
+        public AuthLogic(AuthServiceDbContext dbContext, IJwtLogic jwtLogic, IOptions<SecurityOptions> options, ILogger<IAuthLogic> logger)
         {
             _dbContext = dbContext;
             _jwtLogic = jwtLogic;
             _securityOptions = options.Value;
+            _logger = logger;
         }
-        public async Task<AuthServiceResponse> Login(LoginDto loginDto)
+        public async Task<AuthServiceResponse> LoginAsync(LoginDto loginDto)
         {
             var credentials = _dbContext.UserCredentials.Where(u => u.Email == loginDto.Email).FirstOrDefault();
             if (credentials == null ||
@@ -50,6 +52,33 @@ namespace TechTrack.AuthService.Logic.Implementations
         public void Logout(string refreshToken)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<AuthServiceResponse> RefreshAsync(string refreshToken)
+        {
+            var refreshTokenFromDb = _dbContext.RefreshTokens.FirstOrDefault(t => t.Token == refreshToken);
+            if (refreshTokenFromDb == null)
+            {
+                _logger.LogWarning("The issued refresh token was not found in DB.");
+                throw new UnauthorizedException("Refresh токен не найден. Необходимо пройти аутентификацию.");
+            }
+
+            if (refreshTokenFromDb.ExpiredAt < DateTime.UtcNow)
+                throw new UnauthorizedException("Refresh токен просрочен. Необходимо пройти аутентификацию.");
+
+            var newRefreshToken = _jwtLogic.GenerateRefreshToken();
+            var newAccessToken = _jwtLogic.GenerateAccessToken(refreshTokenFromDb.UserId);
+
+            refreshTokenFromDb.Token = newRefreshToken;
+            refreshTokenFromDb.ExpiredAt = DateTime.UtcNow.AddDays(_securityOptions.JwtRefreshTokenDurationInDays);
+
+            await _dbContext.SaveChangesAsync();
+            return new AuthServiceResponse()
+            {
+                RefreshToken = newRefreshToken,
+                RefreshTokenExpiredAt = refreshTokenFromDb.ExpiredAt,
+                AccessToken = newAccessToken,
+            };
         }
     }
 }
