@@ -9,6 +9,10 @@
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="12.0.0" />
     <PackageReference Include="Grpc.AspNetCore" Version="2.71.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.71.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.9" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
@@ -20,5 +24,6 @@
 
   <ItemGroup>
 	<Protobuf Include="Protos/auth.proto" GrpcServices="Both" />
+	<Protobuf Include="Protos/roles.proto" GrpcServices="Both" />
   </ItemGroup>
 </Project>
