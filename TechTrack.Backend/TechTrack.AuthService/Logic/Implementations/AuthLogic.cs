@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using TechTrack.AuthService.Configuration;
 using TechTrack.AuthService.Data;
 using TechTrack.AuthService.Data.Entities;
@@ -49,22 +50,38 @@ namespace TechTrack.AuthService.Logic.Implementations
 
         }
 
-        public void Logout(string refreshToken)
+        public async Task LogoutAllAsync(Guid userId)
         {
-            throw new NotImplementedException();
+            var tokens = await _dbContext.RefreshTokens.Where(t => t.UserId == userId).ToListAsync();
+            if(tokens.Count != 0)
+            {
+                _dbContext.RemoveRange(tokens);
+                await _dbContext.SaveChangesAsync();
+            }
+            return;
+        }
+
+        public async Task LogoutAsync(string refreshToken)
+        {
+            var refreshTokenFromDb = _dbContext.RefreshTokens.FirstOrDefault(t => t.Token == refreshToken);
+            if (refreshTokenFromDb == null || refreshTokenFromDb.ExpiredAt < DateTime.UtcNow)
+            {
+                throw new UnauthorizedException("Refresh токен уже недействителен.");
+            }
+
+            _dbContext.Remove(refreshTokenFromDb);
+            await _dbContext.SaveChangesAsync();
+
+            return;
         }
 
         public async Task<AuthServiceResponse> RefreshAsync(string refreshToken)
         {
             var refreshTokenFromDb = _dbContext.RefreshTokens.FirstOrDefault(t => t.Token == refreshToken);
-            if (refreshTokenFromDb == null)
+            if (refreshTokenFromDb == null || refreshTokenFromDb.ExpiredAt < DateTime.UtcNow)
             {
-                _logger.LogWarning("The issued refresh token was not found in DB.");
-                throw new UnauthorizedException("Refresh токен не найден. Необходимо пройти аутентификацию.");
+                throw new UnauthorizedException("Refresh токен недействителен. Необходимо пройти аутентификацию.");
             }
-
-            if (refreshTokenFromDb.ExpiredAt < DateTime.UtcNow)
-                throw new UnauthorizedException("Refresh токен просрочен. Необходимо пройти аутентификацию.");
 
             var newRefreshToken = _jwtLogic.GenerateRefreshToken();
             var newAccessToken = _jwtLogic.GenerateAccessToken(refreshTokenFromDb.UserId);

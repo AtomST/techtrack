@@ -1,9 +1,11 @@
-using TechTrack.AuthService.Data;
+using Microsoft.AspNetCore.Authentication;
 using TechTrack.AuthService.Configuration;
+using TechTrack.AuthService.Data;
+using TechTrack.AuthService.Logic.gRPC;
 using TechTrack.AuthService.Logic.Implementations;
 using TechTrack.AuthService.Logic.Interfaces;
+using TechTrack.Shared.Logic;
 using TechTrack.Shared.Middleware;
-using TechTrack.AuthService.Logic.gRPC;
 namespace TechTrack.AuthService
 {
     public class Program
@@ -11,6 +13,16 @@ namespace TechTrack.AuthService
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            builder.Services.AddSingleton(new JwtTokenValidator
+                (
+                    builder.Configuration["Jwt:Issuer"],
+                    builder.Configuration["Security:JwtAccessTokenKey"]
+                ));
+
+            builder.Services
+                .AddAuthentication("CustomScheme")
+                .AddScheme<AuthenticationSchemeOptions, JwtAuthenticationHandler>("CustomScheme", opt => { });
 
             builder.Services.AddDbContext<AuthServiceDbContext>();
 
@@ -25,7 +37,11 @@ namespace TechTrack.AuthService
             var app = builder.Build();
 
             app.UseMiddleware<GlobalExceptionHandler>();
+            app.UseMiddleware<JwtAuthenticationMiddleware>();
             app.MapGrpcService<AuthGrpcLogic>();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
             app.MapControllers();
             app.Run();
         }

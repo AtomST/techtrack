@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using System.Net;
+using Microsoft.AspNetCore.Mvc;
 using TechTrack.AuthService.Logic.Interfaces;
 using TechTrack.AuthService.Logic.Models;
 using TechTrack.Shared.Exceptions;
 using TechTrack.Shared.Responses;
+using System.Security.Claims;
 
 namespace TechTrack.AuthService.Controllers
 {
@@ -27,11 +30,45 @@ namespace TechTrack.AuthService.Controllers
 
             return Ok(new SuccessResponse()
             {
-                StatusCode = System.Net.HttpStatusCode.OK,
+                StatusCode = HttpStatusCode.OK,
                 Data = new 
                 {
                     accessToken = response.AccessToken,
                 }
+            });
+        }
+
+
+        [HttpPost("logout")]
+        [Authorize]
+        public async Task<IActionResult> Logout()
+        {
+            var refreshToken = Request.Cookies.FirstOrDefault(c => c.Key == AUTH_COOKIE_NAME).Value;
+            if (string.IsNullOrEmpty(refreshToken))
+                throw new UnauthorizedException("Refresh токен отсутствует. Необходима аутентификация");
+
+             await _authLogic.LogoutAsync(refreshToken);
+            SetRefreshToken(Response.Cookies, "", DateTime.UnixEpoch);
+
+            return Ok(new SuccessResponse 
+            {
+                StatusCode = HttpStatusCode.OK
+            });
+        }
+
+        [HttpPost("logout-all")]
+        [Authorize]
+        public async Task<IActionResult> LogoutAll()
+        {
+            if (!Guid.TryParse(User.FindFirstValue("id"), out var userId))
+                throw new UnauthorizedException("Требуется аутентификация");
+
+            await _authLogic.LogoutAllAsync(userId);
+            SetRefreshToken(Response.Cookies, "", DateTime.UnixEpoch);
+
+            return Ok(new SuccessResponse
+            {
+                StatusCode = HttpStatusCode.OK
             });
         }
 
@@ -49,7 +86,7 @@ namespace TechTrack.AuthService.Controllers
 
             return Ok(new SuccessResponse()
             {
-                StatusCode = System.Net.HttpStatusCode.OK,
+                StatusCode = HttpStatusCode.OK,
                 Data = new
                 {
                     accessToken = response.AccessToken,
