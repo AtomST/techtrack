@@ -3,6 +3,7 @@ using TechTrack.Shared.Responses;
 using System.Net;
 using TechTrack.UserService.Logic.Interfaces;
 using TechTrack.UserService.Models.Requests;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TechTrack.UserService.Controllers
 {
@@ -62,6 +63,7 @@ namespace TechTrack.UserService.Controllers
         }
 
         [HttpGet("secured")]
+        [Authorize]
         public async Task<IActionResult> Secured()
         {
             return Ok(User.FindFirst(w => w.Type == "id").Value);

@@ -1,4 +1,5 @@
 using Grpc.Net.Client;
+using Microsoft.AspNetCore.Authentication;
 using TechTrack.Shared.Logic;
 using TechTrack.Shared.Middleware;
 using TechTrack.Shared.Protos;
@@ -19,25 +20,28 @@ namespace TechTrack.UserService
                     builder.Configuration["Jwt:AccessTokenKey"]
                 ));
 
+            builder.Services
+                .AddAuthentication("CustomScheme")
+                .AddScheme<AuthenticationSchemeOptions, JwtAuthenticationHandler>("CustomScheme", opt => { });
+
             builder.Services.AddTransient<GrpcErrorInterceptor>();
 
-            //Add services to the container.
             builder.Services.AddGrpcClient<AuthService.AuthServiceClient>(opt =>
             {
                 opt.Address = new Uri("http://auth-service:8081");
             }).AddInterceptor<GrpcErrorInterceptor>();
 
             builder.Services.AddDbContext<UserServiceDbContext>();
+
             builder.Services.AddScoped<IUserLogic, UserLogic>();
             builder.Services.AddScoped<AuthClient>();
             builder.Services.AddControllers();
             var app = builder.Build();
             app.UseMiddleware<GlobalExceptionHandler>();
 
-            // Configure the HTTP request pipeline.
-
-            app.UseAuthorization();
             app.UseMiddleware<JwtAuthenticationMiddleware>();
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.MapControllers();
 

@@ -12,6 +12,7 @@ namespace TechTrack.UserService.Data
         }
 
         public DbSet<User> Users { get; set; }
+        public DbSet<Role> Roles { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -37,6 +38,28 @@ namespace TechTrack.UserService.Data
                     .HasColumnName("created_at")
                     .HasColumnType("timestamp with time zone")
                     .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                entity.Property(e => e.PhoneNumber)
+                    .HasColumnName("phoneNumber");
+
+                entity.Property(e => e.RoleId)
+                    .HasColumnName("role_id");
+
+                entity
+                    .HasOne(u => u.Role)
+                    .WithMany(r => r.Users)
+                    .HasForeignKey(u => u.RoleId);
+            });
+
+            modelBuilder.Entity<Role>(entity =>
+            {
+                entity.ToTable("roles");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("id");
+
+                entity.Property(e => e.Name)
+                    .HasColumnName("name");
             });
         }
         
