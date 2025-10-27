@@ -1,0 +1,18 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "TechTrack.Shared.Protos";
+
+package roles;
+
+service RoleService{
+	rpc GetUserRole(GetRoleRequest) returns (GetRoleResponse);
+}
+
+message GetRoleRequest{
+	string user_id = 1;
+}
+
+message GetRoleResponse{
+	string user_role = 1;
+}
+

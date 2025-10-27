@@ -1,0 +1,84 @@
+version: '3.8'
+services:
+  api-gateway:
+    build:
+      context: .
+      dockerfile: TechTrack.ApiGateway/Dockerfile
+    ports:
+      - "8080:8080"
+
+  postgres-auth:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: auth_service
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    volumes:
+      - postgres_auth_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  postgres-user:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: user_service
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    volumes:
+      - postgres_user_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+  postgres-organization:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: organization_service
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    volumes:
+      - postgres_organization_data:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"
+  
+  organization-service:
+    build:
+      context: .
+      dockerfile: TechTrack.OrganizationService/Dockerfile
+    ports:
+      - "8080"
+    environment:
+      - ConnectionStrings__OrganizatinoServiceDbConnection=Host=postgres-organization;Database=organization_service;Username=postgres;Password=admin
+      - Jwt__AccessTokenKey=5c6dd372771c07a19980ce9ad6f251f3ea8f9974a85a943152a68906a2708f7d
+      - Jwt__Issuer=http://auth-service
+    depends_on:
+      - postgres-organization
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: TechTrack.AuthService/Dockerfile
+    ports:
+      - "8080" # REST(HTTP/1.1)
+      - "8081" # gRPC(HTTP/2)
+    environment:
+      - ConnectionStrings__AuthServiceDbConnection=Host=postgres-auth;Database=auth_service;Username=postgres;Password=admin
+      - Jwt__Issuer=http://auth-service
+    depends_on:
+      - postgres-auth
+
+  user-service:
+    build:
+      context: .
+      dockerfile: TechTrack.UserService/Dockerfile
+    ports:
+      - "8080"
+    environment:
+      - ConnectionStrings__UserServiceDbConnection=Host=postgres-user;Database=user_service;Username=postgres;Password=admin
+      - Jwt__Issuer=http://auth-service:8080
+      - Jwt__AccessTokenKey=5c6dd372771c07a19980ce9ad6f251f3ea8f9974a85a943152a68906a2708f7d
+    depends_on:
+      - postgres-user
+volumes:
+  postgres_auth_data:
+  postgres_user_data:
+  postgres_organization_data:
