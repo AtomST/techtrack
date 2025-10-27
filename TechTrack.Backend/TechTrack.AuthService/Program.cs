@@ -6,6 +6,7 @@ using TechTrack.AuthService.Logic.Implementations;
 using TechTrack.AuthService.Logic.Interfaces;
 using TechTrack.Shared.Logic;
 using TechTrack.Shared.Middleware;
+using TechTrack.Shared.Protos;
 namespace TechTrack.AuthService
 {
     public class Program
@@ -18,6 +19,11 @@ namespace TechTrack.AuthService
 
             builder.Services.AddScoped<IJwtLogic, JwtLogic>();
             builder.Services.AddScoped<IAuthLogic, AuthLogic>();
+            builder.Services.AddTransient<GrpcErrorInterceptor>();
+            builder.Services.AddGrpcClient<RoleService.RoleServiceClient>(opt =>
+            {
+                opt.Address = new Uri("http://user-service:8081");
+            }).AddInterceptor<GrpcErrorInterceptor>();
 
             builder.Services.AddControllers();
 

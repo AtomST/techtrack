@@ -2,7 +2,7 @@
 {
     public interface IJwtLogic
     {
-        public string GenerateAccessToken(Guid userId);
+        public Task<string> GenerateAccessToken(Guid userId);
         public string GenerateRefreshToken();
     }
 }

@@ -4,6 +4,7 @@ using System.Net;
 using TechTrack.UserService.Logic.Interfaces;
 using TechTrack.UserService.Models.Requests;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace TechTrack.UserService.Controllers
 {
@@ -66,8 +67,22 @@ namespace TechTrack.UserService.Controllers
         [Authorize]
         public async Task<IActionResult> Secured()
         {
-            return Ok(User.FindFirst(w => w.Type == "id").Value);
+            return Ok(new
+            {
+                Id = User.FindFirstValue(ClaimTypes.NameIdentifier),
+                Role = User.FindFirstValue(ClaimTypes.Role)
+            });
         }
-        
+
+        [HttpGet("dev")]
+        [Authorize(Roles = "Dev")]
+        public async Task<IActionResult> TestDevOnly()
+        {
+            return Ok(new
+            {
+                Id = User.FindFirstValue(ClaimTypes.NameIdentifier),
+                Role = User.FindFirstValue(ClaimTypes.Role)
+            });
+        }
     }
 }

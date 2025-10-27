@@ -13,23 +13,28 @@ namespace TechTrack.AuthService.Logic.Implementations
     public class JwtLogic : IJwtLogic
     {
         private readonly ILogger<IJwtLogic> _logger;
+        private readonly RoleService.RoleServiceClient _roleServiceClient;
         private readonly SecurityOptions _options;
-        public JwtLogic(ILogger<JwtLogic> logger, IOptions<SecurityOptions> options)
+        public JwtLogic(ILogger<JwtLogic> logger,RoleService.RoleServiceClient roleServiceClient, IOptions<SecurityOptions> options)
         {
             _logger = logger;
+            _roleServiceClient = roleServiceClient;
             _options = options.Value;
         }
-        public string GenerateAccessToken(Guid userId)
+        public async Task<string> GenerateAccessToken(Guid userId)
         {
             try
             {
+                var grpcResponse = await _roleServiceClient.GetUserRoleAsync(new GetRoleRequest { UserId = userId.ToString()});
+
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var accessTokenKey = Encoding.ASCII.GetBytes(_options.JwtAccessTokenKey);
                 var tokenDescriprot = new SecurityTokenDescriptor
                 {
                     Subject = new ClaimsIdentity(
                     [
-                        new Claim("id", userId.ToString())
+                        new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
+                        new Claim(ClaimTypes.Role, grpcResponse.UserRole)
                     ]),
                     Expires = DateTime.UtcNow.AddMinutes(_options.JwtAccessTokenDurationInMinutes),
                     SigningCredentials = new SigningCredentials(

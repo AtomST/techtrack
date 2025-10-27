@@ -4,6 +4,7 @@ using TechTrack.Shared.Logic;
 using TechTrack.Shared.Middleware;
 using TechTrack.Shared.Protos;
 using TechTrack.UserService.Data;
+using TechTrack.UserService.Logic.gRPC;
 using TechTrack.UserService.Logic.Implementations;
 using TechTrack.UserService.Logic.Interfaces;
 
@@ -23,7 +24,7 @@ namespace TechTrack.UserService
             builder.Services
                 .AddAuthentication("CustomScheme")
                 .AddScheme<AuthenticationSchemeOptions, JwtAuthenticationHandler>("CustomScheme", opt => { });
-
+            builder.Services.AddGrpc();
             builder.Services.AddTransient<GrpcErrorInterceptor>();
 
             builder.Services.AddGrpcClient<AuthService.AuthServiceClient>(opt =>
@@ -38,8 +39,10 @@ namespace TechTrack.UserService
             builder.Services.AddControllers();
             var app = builder.Build();
             app.UseMiddleware<GlobalExceptionHandler>();
-
             app.UseMiddleware<JwtAuthenticationMiddleware>();
+
+            app.MapGrpcService<RolesGrpcLogic>();
+
             app.UseAuthentication();
             app.UseAuthorization();
 

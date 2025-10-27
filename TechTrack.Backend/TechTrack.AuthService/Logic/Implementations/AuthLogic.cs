@@ -29,7 +29,7 @@ namespace TechTrack.AuthService.Logic.Implementations
                 !BCrypt.Net.BCrypt.Verify(loginDto.Password, credentials.Password))
                 throw new InvalidInputException("Неверный логин или пароль");
             
-            var accessToken = _jwtLogic.GenerateAccessToken(credentials.Id);
+            var accessToken = await _jwtLogic.GenerateAccessToken(credentials.Id);
             var refreshToken = _jwtLogic.GenerateRefreshToken();
 
             var refreshTokenEntity = new RefreshToken()
@@ -89,7 +89,7 @@ namespace TechTrack.AuthService.Logic.Implementations
             }
 
             var newRefreshToken = _jwtLogic.GenerateRefreshToken();
-            var newAccessToken = _jwtLogic.GenerateAccessToken(refreshTokenFromDb.UserId);
+            var newAccessToken = await _jwtLogic.GenerateAccessToken(refreshTokenFromDb.UserId);
 
             refreshTokenFromDb.Token = newRefreshToken;
             refreshTokenFromDb.ExpiredAt = DateTime.UtcNow.AddDays(_securityOptions.JwtRefreshTokenDurationInDays);

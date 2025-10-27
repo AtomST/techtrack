@@ -45,7 +45,7 @@ namespace TechTrack.AuthService.Logic.gRPC
                 Password = BCrypt.Net.BCrypt.HashPassword(request.Password, _securityOptions.BCryptWorkFactor)
             };
             await _dbContext.AddAsync(userCredentials);
-            var accessToken = _jwtLogic.GenerateAccessToken(userCredentials.Id);
+            var accessToken = await _jwtLogic.GenerateAccessToken(userCredentials.Id);
             var refreshToken = _jwtLogic.GenerateRefreshToken();
 
             var refreshTokenEntity = new RefreshToken()
