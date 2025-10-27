@@ -50,24 +50,25 @@ namespace TechTrack.AuthService.Logic.Implementations
 
         }
 
-        public async Task LogoutAllAsync(Guid userId)
+        public async Task LogoutAllAsync(string refreshToken)
         {
-            var tokens = await _dbContext.RefreshTokens.Where(t => t.UserId == userId).ToListAsync();
-            if(tokens.Count != 0)
+            var tokenFromDb = await _dbContext.RefreshTokens.Where(t => t.Token == refreshToken).FirstOrDefaultAsync();
+            if (tokenFromDb == null)
             {
-                _dbContext.RemoveRange(tokens);
-                await _dbContext.SaveChangesAsync();
+                throw new UnauthorizedException("Refresh токен недействителен.");
             }
+
+            await _dbContext.RefreshTokens
+                .Where(t => t.UserId == tokenFromDb.UserId)
+                .ExecuteDeleteAsync();
+
             return;
         }
 
         public async Task LogoutAsync(string refreshToken)
         {
-            var refreshTokenFromDb = _dbContext.RefreshTokens.FirstOrDefault(t => t.Token == refreshToken);
-            if (refreshTokenFromDb == null || refreshTokenFromDb.ExpiredAt < DateTime.UtcNow)
-            {
-                throw new UnauthorizedException("Refresh токен уже недействителен.");
-            }
+            var refreshTokenFromDb = _dbContext.RefreshTokens.FirstOrDefault(t => t.Token == refreshToken)
+                ?? throw new UnauthorizedException("Refresh токен недействителен.");
 
             _dbContext.Remove(refreshTokenFromDb);
             await _dbContext.SaveChangesAsync();
@@ -77,10 +78,14 @@ namespace TechTrack.AuthService.Logic.Implementations
 
         public async Task<AuthServiceResponse> RefreshAsync(string refreshToken)
         {
-            var refreshTokenFromDb = _dbContext.RefreshTokens.FirstOrDefault(t => t.Token == refreshToken);
-            if (refreshTokenFromDb == null || refreshTokenFromDb.ExpiredAt < DateTime.UtcNow)
+            var refreshTokenFromDb = _dbContext.RefreshTokens.FirstOrDefault(t => t.Token == refreshToken)
+                ?? throw new UnauthorizedException("Refresh токен недействителен. Необходимо пройти аутентификацию.");
+
+            if (refreshTokenFromDb.ExpiredAt < DateTime.UtcNow)
             {
-                throw new UnauthorizedException("Refresh токен недействителен. Необходимо пройти аутентификацию.");
+                _dbContext.RefreshTokens.Remove(refreshTokenFromDb);
+                await _dbContext.SaveChangesAsync();
+                throw new UnauthorizedException("Refresh токен истек. Необходимо пройти аутентификацию.");
             }
 
             var newRefreshToken = _jwtLogic.GenerateRefreshToken();

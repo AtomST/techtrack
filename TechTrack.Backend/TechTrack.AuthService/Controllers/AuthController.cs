@@ -40,7 +40,6 @@ namespace TechTrack.AuthService.Controllers
 
 
         [HttpPost("logout")]
-        [Authorize]
         public async Task<IActionResult> Logout()
         {
             var refreshToken = Request.Cookies.FirstOrDefault(c => c.Key == AUTH_COOKIE_NAME).Value;
@@ -57,13 +56,13 @@ namespace TechTrack.AuthService.Controllers
         }
 
         [HttpPost("logout-all")]
-        [Authorize]
         public async Task<IActionResult> LogoutAll()
         {
-            if (!Guid.TryParse(User.FindFirstValue("id"), out var userId))
-                throw new UnauthorizedException("Требуется аутентификация");
+            var refreshToken = Request.Cookies.FirstOrDefault(c => c.Key == AUTH_COOKIE_NAME).Value;
+            if (string.IsNullOrEmpty(refreshToken))
+                throw new UnauthorizedException("Refresh токен отсутствует. Необходима аутентификация");
 
-            await _authLogic.LogoutAllAsync(userId);
+            await _authLogic.LogoutAllAsync(refreshToken);
             SetRefreshToken(Response.Cookies, "", DateTime.UnixEpoch);
 
             return Ok(new SuccessResponse

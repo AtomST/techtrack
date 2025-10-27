@@ -7,6 +7,6 @@ namespace TechTrack.AuthService.Logic.Interfaces
         public Task<AuthServiceResponse> LoginAsync(LoginDto loginDto);
         public Task<AuthServiceResponse> RefreshAsync(string refreshToken);
         public Task LogoutAsync(string refreshToken);
-        public Task LogoutAllAsync(Guid userId);
+        public Task LogoutAllAsync(string refreshToken);
     }
 }

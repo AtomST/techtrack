@@ -14,16 +14,6 @@ namespace TechTrack.AuthService
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddSingleton(new JwtTokenValidator
-                (
-                    builder.Configuration["Jwt:Issuer"],
-                    builder.Configuration["Security:JwtAccessTokenKey"]
-                ));
-
-            builder.Services
-                .AddAuthentication("CustomScheme")
-                .AddScheme<AuthenticationSchemeOptions, JwtAuthenticationHandler>("CustomScheme", opt => { });
-
             builder.Services.AddDbContext<AuthServiceDbContext>();
 
             builder.Services.AddScoped<IJwtLogic, JwtLogic>();
@@ -37,11 +27,8 @@ namespace TechTrack.AuthService
             var app = builder.Build();
 
             app.UseMiddleware<GlobalExceptionHandler>();
-            app.UseMiddleware<JwtAuthenticationMiddleware>();
             app.MapGrpcService<AuthGrpcLogic>();
 
-            app.UseAuthentication();
-            app.UseAuthorization();
             app.MapControllers();
             app.Run();
         }
