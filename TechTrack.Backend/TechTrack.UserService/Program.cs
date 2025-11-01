@@ -1,5 +1,6 @@
 using Grpc.Net.Client;
 using Microsoft.AspNetCore.Authentication;
+using TechTrack.Shared.Auth;
 using TechTrack.Shared.Logic;
 using TechTrack.Shared.Middleware;
 using TechTrack.Shared.Protos;
@@ -20,10 +21,9 @@ namespace TechTrack.UserService
                     builder.Configuration["Jwt:Issuer"],
                     builder.Configuration["Jwt:AccessTokenKey"]
                 ));
+            builder.Services.AddAuthenticationWithoutTokenValidator();
+            builder.Services.AddTechTrackAuthorization();
 
-            builder.Services
-                .AddAuthentication("CustomScheme")
-                .AddScheme<AuthenticationSchemeOptions, JwtAuthenticationHandler>("CustomScheme", opt => { });
             builder.Services.AddGrpc();
             builder.Services.AddTransient<GrpcErrorInterceptor>();
 

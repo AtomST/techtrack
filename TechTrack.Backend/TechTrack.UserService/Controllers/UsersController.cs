@@ -5,6 +5,7 @@ using TechTrack.UserService.Logic.Interfaces;
 using TechTrack.UserService.Models.Requests;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using TechTrack.Shared.Auth;
 
 namespace TechTrack.UserService.Controllers
 {
@@ -75,7 +76,7 @@ namespace TechTrack.UserService.Controllers
         }
 
         [HttpGet("dev")]
-        [Authorize(Roles = "Dev")]
+        [Authorize(Policy = Policies.DevOnly)]
         public async Task<IActionResult> TestDevOnly()
         {
             return Ok(new
