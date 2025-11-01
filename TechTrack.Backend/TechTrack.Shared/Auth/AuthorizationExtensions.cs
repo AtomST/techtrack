@@ -1,0 +1,52 @@
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace TechTrack.Shared.Auth
+{
+    public static class AuthorizationExtensions
+    {
+        public static IServiceCollection AddTechTrackAuthorization(this IServiceCollection services)
+        {
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("DevOnly", policy =>
+                    policy.RequireRole(Roles.Dev));
+
+                options.AddPolicy("AdminAccess", policy =>
+                    policy.RequireRole(
+                        Roles.Admin,
+                        Roles.Dev));
+
+                options.AddPolicy("ManagementAccess", policy =>
+                    policy.RequireRole(
+                        Roles.DepartmentHead,
+                        Roles.CompanyHead,
+                        Roles.Admin,
+                        Roles.Dev));
+
+                options.AddPolicy("SupervisorAccess", policy =>
+                    policy.RequireRole(
+                        Roles.Manager,
+                        Roles.DepartmentHead,
+                        Roles.CompanyHead,
+                        Roles.Admin,
+                        Roles.Dev));
+
+                options.AddPolicy("EmployeeAccess", policy =>
+                    policy.RequireRole(
+                        Roles.Employee,
+                        Roles.Manager,
+                        Roles.DepartmentHead,
+                        Roles.CompanyHead,
+                        Roles.Admin,
+                        Roles.Dev));
+            });
+
+            return services;
+        }
+    }
+}
