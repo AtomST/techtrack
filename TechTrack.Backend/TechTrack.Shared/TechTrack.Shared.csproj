@@ -23,7 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-	<Protobuf Include="Protos/auth.proto" GrpcServices="Both" />
 	<Protobuf Include="Protos/roles.proto" GrpcServices="Both" />
   </ItemGroup>
 </Project>

@@ -2,7 +2,6 @@
 using TechTrack.Shared.Responses;
 using System.Net;
 using TechTrack.UserService.Logic.Interfaces;
-using TechTrack.UserService.Models.Requests;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using TechTrack.Shared.Auth;
@@ -30,40 +29,6 @@ namespace TechTrack.UserService.Controllers
         {
             return Ok();
         }
-
-        [HttpPost]
-        public async Task<IActionResult> Register([FromBody] RegisterDto dto)
-        {
-            var result = await _userLogic.Register(dto);
-
-            try
-            {
-                Cookie cookie = new Cookie
-                {
-                    Name = AUTH_COOKIE_NAME,
-                    Value = result.RefreshToken,
-                    Expires = result.RefreshTokenExpiredAt,
-                    HttpOnly = true
-                };
-                Response.Cookies.Append(cookie.Name, cookie.Value, new CookieOptions { Expires = cookie.Expires, HttpOnly = true });
-
-
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-
-            return Created("users", new SuccessResponse()
-            {
-                StatusCode = HttpStatusCode.Created,
-                Data = new 
-                {
-                    accessToken = result.AccessToken
-                }
-            });
-        }
-
         [HttpGet("secured")]
         [Authorize]
         public async Task<IActionResult> Secured()

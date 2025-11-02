@@ -1,7 +1,7 @@
+using MassTransit;
 using Microsoft.AspNetCore.Authentication;
 using TechTrack.AuthService.Configuration;
 using TechTrack.AuthService.Data;
-using TechTrack.AuthService.Logic.gRPC;
 using TechTrack.AuthService.Logic.Implementations;
 using TechTrack.AuthService.Logic.Interfaces;
 using TechTrack.Shared.Logic;
@@ -17,23 +17,38 @@ namespace TechTrack.AuthService
 
             builder.Services.AddDbContext<AuthServiceDbContext>();
 
+            //Services
             builder.Services.AddScoped<IJwtLogic, JwtLogic>();
             builder.Services.AddScoped<IAuthLogic, AuthLogic>();
+
+            //gRPC
             builder.Services.AddTransient<GrpcErrorInterceptor>();
             builder.Services.AddGrpcClient<RoleService.RoleServiceClient>(opt =>
             {
                 opt.Address = new Uri("http://user-service:8081");
             }).AddInterceptor<GrpcErrorInterceptor>();
+            builder.Services.AddGrpc();
+
+            //MassTransit
+            builder.Services.AddMassTransit(x =>
+            {
+                x.UsingRabbitMq((context, cfg) =>
+                {
+                    cfg.Host(builder.Configuration["RabbitMQ:Host"], "/", h =>
+                    {
+                        h.Username(builder.Configuration["RabbitMQ:Username"]);
+                        h.Password(builder.Configuration["RabbitMQ:Password"]);
+                    });
+                });
+            });
 
             builder.Services.AddControllers();
 
             builder.Services.Configure<SecurityOptions>(builder.Configuration.GetSection("Security"));
-            builder.Services.AddGrpc();
 
             var app = builder.Build();
 
             app.UseMiddleware<GlobalExceptionHandler>();
-            app.MapGrpcService<AuthGrpcLogic>();
 
             app.MapControllers();
             app.Run();

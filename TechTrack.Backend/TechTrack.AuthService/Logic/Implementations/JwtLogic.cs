@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using System.Text;
 using TechTrack.AuthService.Configuration;
 using TechTrack.AuthService.Logic.Interfaces;
+using TechTrack.Shared.Auth;
 
 namespace TechTrack.AuthService.Logic.Implementations
 {
@@ -21,12 +22,16 @@ namespace TechTrack.AuthService.Logic.Implementations
             _roleServiceClient = roleServiceClient;
             _options = options.Value;
         }
-        public async Task<string> GenerateAccessToken(Guid userId)
+        public async Task<string> GenerateAccessToken(Guid userId, bool isLogin = true)
         {
             try
             {
-                var grpcResponse = await _roleServiceClient.GetUserRoleAsync(new GetRoleRequest { UserId = userId.ToString()});
-
+                var userRole = Roles.Undefined;
+                if(isLogin)
+                {
+                    var grpcResponse = await _roleServiceClient.GetUserRoleAsync(new GetRoleRequest { UserId = userId.ToString()});
+                    userRole = grpcResponse.UserRole;
+                }
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var accessTokenKey = Encoding.ASCII.GetBytes(_options.JwtAccessTokenKey);
                 var tokenDescriprot = new SecurityTokenDescriptor
@@ -34,7 +39,7 @@ namespace TechTrack.AuthService.Logic.Implementations
                     Subject = new ClaimsIdentity(
                     [
                         new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
-                        new Claim(ClaimTypes.Role, grpcResponse.UserRole)
+                        new Claim(ClaimTypes.Role, userRole)
                     ]),
                     Expires = DateTime.UtcNow.AddMinutes(_options.JwtAccessTokenDurationInMinutes),
                     SigningCredentials = new SigningCredentials(
