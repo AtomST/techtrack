@@ -2,6 +2,7 @@ using MassTransit;
 using Microsoft.AspNetCore.Authentication;
 using TechTrack.AuthService.Configuration;
 using TechTrack.AuthService.Data;
+using TechTrack.AuthService.Logic.EventHandlers;
 using TechTrack.AuthService.Logic.Implementations;
 using TechTrack.AuthService.Logic.Interfaces;
 using TechTrack.Shared.Logic;
@@ -32,6 +33,8 @@ namespace TechTrack.AuthService
             //MassTransit
             builder.Services.AddMassTransit(x =>
             {
+                x.AddConsumer<UserRoleChangedHandler>();
+
                 x.UsingRabbitMq((context, cfg) =>
                 {
                     cfg.Host(builder.Configuration["RabbitMQ:Host"], "/", h =>
@@ -39,7 +42,13 @@ namespace TechTrack.AuthService
                         h.Username(builder.Configuration["RabbitMQ:Username"]);
                         h.Password(builder.Configuration["RabbitMQ:Password"]);
                     });
+
+                    cfg.ReceiveEndpoint("role-changed", e =>
+                    {
+                        e.ConfigureConsumer<UserRoleChangedHandler>(context);
+                    });
                 });
+
             });
 
             builder.Services.AddControllers();
@@ -47,7 +56,7 @@ namespace TechTrack.AuthService
             builder.Services.Configure<SecurityOptions>(builder.Configuration.GetSection("Security"));
 
             var app = builder.Build();
-
+            app.MapGrpcService<UserRoleChangedHandler>();
             app.UseMiddleware<GlobalExceptionHandler>();
 
             app.MapControllers();

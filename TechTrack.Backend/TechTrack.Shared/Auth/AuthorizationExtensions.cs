@@ -21,9 +21,8 @@ namespace TechTrack.Shared.Auth
                         Roles.Admin,
                         Roles.Dev));
 
-                options.AddPolicy("ManagementAccess", policy =>
+                options.AddPolicy("CompanyHeadAccess", policy =>
                     policy.RequireRole(
-                        Roles.DepartmentHead,
                         Roles.CompanyHead,
                         Roles.Admin,
                         Roles.Dev));

@@ -1,0 +1,18 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "TechTrack.Shared.Protos";
+
+package company_user;
+
+service CompanyUserService{
+	rpc IsUserInCompany(IsUserInCompanyRequest) returns (IsUserInCompanyResponse);
+}
+
+message IsUserInCompanyRequest{
+	string user_id = 1;
+	string company_id = 2;
+}
+
+message IsUserInCompanyResponse{
+	bool is_user_in_company = 1;
+}

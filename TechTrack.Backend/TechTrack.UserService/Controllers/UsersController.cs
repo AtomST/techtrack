@@ -5,6 +5,8 @@ using TechTrack.UserService.Logic.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using TechTrack.Shared.Auth;
+using TechTrack.UserService.Models;
+using TechTrack.UserService.Models.Requests;
 
 namespace TechTrack.UserService.Controllers
 {
@@ -48,6 +50,23 @@ namespace TechTrack.UserService.Controllers
             {
                 Id = User.FindFirstValue(ClaimTypes.NameIdentifier),
                 Role = User.FindFirstValue(ClaimTypes.Role)
+            });
+        }
+
+        [HttpPatch("{userId:guid}/role")]
+        [Authorize(Policy = Policies.AdminAccess)]
+        public async Task<IActionResult> ChangeUserRole(Guid userId, [FromBody] ChangeRoleRequest request)
+        {
+            var permissionInfo = new UserPermissionInfo()
+            {
+                Role = User.FindFirstValue(ClaimTypes.Role),
+                CompanyId = User.FindFirstValue(CustomClaimTypes.CompanyId)
+            };
+
+            await _userLogic.ChangeUserRoleAsync(userId, request.Role, permissionInfo);
+            return Ok(new SuccessResponse 
+            {
+                StatusCode = HttpStatusCode.OK
             });
         }
     }

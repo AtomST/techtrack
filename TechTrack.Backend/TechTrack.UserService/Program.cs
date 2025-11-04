@@ -27,6 +27,11 @@ namespace TechTrack.UserService
             builder.Services.AddTechTrackAuthorization();
 
             builder.Services.AddGrpc();
+            builder.Services.AddTransient<GrpcErrorInterceptor>();
+            builder.Services.AddGrpcClient<CompanyUserService.CompanyUserServiceClient>(opt =>
+            {
+                opt.Address = new Uri("http://organization-service:8081");
+            }).AddInterceptor<GrpcErrorInterceptor>();
 
             builder.Services.AddDbContext<UserServiceDbContext>();
 
