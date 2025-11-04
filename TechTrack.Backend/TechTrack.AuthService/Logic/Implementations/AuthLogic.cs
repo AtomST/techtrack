@@ -78,6 +78,11 @@ namespace TechTrack.AuthService.Logic.Implementations
                 ExpiredAt = DateTime.UtcNow.AddDays(_securityOptions.JwtRefreshTokenDurationInDays)
             };
 
+            UserInfoCache userInfoCache = new UserInfoCache()
+            {
+                UserCredentials = userCredentials
+            };
+            await _dbContext.AddAsync(userInfoCache);
             await _dbContext.AddAsync(refreshTokenEntity);
             await _dbContext.SaveChangesAsync();
 
