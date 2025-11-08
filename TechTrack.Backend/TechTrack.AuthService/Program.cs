@@ -34,7 +34,8 @@ namespace TechTrack.AuthService
             builder.Services.AddMassTransit(x =>
             {
                 x.AddConsumer<UserRoleChangedHandler>();
-
+                x.AddConsumer<UserCompanyChangedHandler>();
+                x.AddConsumer<CompanyRegisteredWithOwnerHandler>();
                 x.UsingRabbitMq((context, cfg) =>
                 {
                     cfg.Host(builder.Configuration["RabbitMQ:Host"], "/", h =>
@@ -45,10 +46,21 @@ namespace TechTrack.AuthService
 
                     cfg.ReceiveEndpoint("role-changed", e =>
                     {
+                        e.AutoDelete = false;
                         e.ConfigureConsumer<UserRoleChangedHandler>(context);
                     });
-                });
 
+                    cfg.ReceiveEndpoint("company-changed", e =>
+                    {
+                        e.AutoDelete = false;
+                        e.ConfigureConsumer<UserCompanyChangedHandler>(context);
+                    });
+                    cfg.ReceiveEndpoint("company-registered-withowner", e =>
+                    {
+                        e.AutoDelete = false;
+                        e.ConfigureConsumer<CompanyRegisteredWithOwnerHandler>(context);
+                    });
+                });
             });
 
             builder.Services.AddControllers();

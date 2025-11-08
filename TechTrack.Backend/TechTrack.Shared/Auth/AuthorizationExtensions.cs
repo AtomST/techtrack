@@ -13,6 +13,9 @@ namespace TechTrack.Shared.Auth
         {
             services.AddAuthorization(options =>
             {
+                options.AddPolicy("PlatformAdminAccess", policy =>
+                    policy.RequireRole(Roles.PlatformAdmin));
+
                 options.AddPolicy("DevOnly", policy =>
                     policy.RequireRole(Roles.Dev));
 

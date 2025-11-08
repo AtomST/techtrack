@@ -53,7 +53,7 @@ namespace TechTrack.UserService.Controllers
             });
         }
 
-        [HttpPatch("{userId:guid}/role")]
+        [HttpPatch("{userId}/role")]
         [Authorize(Policy = Policies.AdminAccess)]
         public async Task<IActionResult> ChangeUserRole(Guid userId, [FromBody] ChangeRoleRequest request)
         {

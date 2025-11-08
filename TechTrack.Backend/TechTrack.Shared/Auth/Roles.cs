@@ -11,6 +11,7 @@ namespace TechTrack.Shared.Auth
         public const string Undefined = "Undefined";
         public const string Dev = "Dev";
         public const string Admin = "Admin";
+        public const string PlatformAdmin = "PlatformAdmin";
         public const string Manager = "Manager";
         public const string DepartmentHead = "DepartmentHead";
         public const string CompanyHead = "CompanyHead";

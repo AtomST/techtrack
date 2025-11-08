@@ -8,6 +8,7 @@ namespace TechTrack.Shared.Auth
 {
     public static class Policies
     {
+        public const string PlatformAdminAccess = "PlatformAdminAccess";
         public const string DevOnly = "DevOnly";
         public const string AdminAccess = "AdminAccess";
         public const string ManagementAccess = "ManagementAccess";

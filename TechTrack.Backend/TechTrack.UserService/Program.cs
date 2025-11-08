@@ -1,7 +1,9 @@
 using Grpc.Net.Client;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
 using TechTrack.Shared.Auth;
+using TechTrack.Shared.Filters;
 using TechTrack.Shared.Logic;
 using TechTrack.Shared.Middleware;
 using TechTrack.Shared.Protos;
@@ -32,12 +34,16 @@ namespace TechTrack.UserService
             {
                 opt.Address = new Uri("http://organization-service:8081");
             }).AddInterceptor<GrpcErrorInterceptor>();
-
+            builder.Services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
+            });
             builder.Services.AddDbContext<UserServiceDbContext>();
 
             builder.Services.AddMassTransit(x =>
             {
                 x.AddConsumer<UserCreatedEventHandler>();
+                x.AddConsumer<CompanyRegisteredWithOwnerHandler>();
 
                 x.UsingRabbitMq((context, cfg) =>
                 {
@@ -49,13 +55,23 @@ namespace TechTrack.UserService
 
                     cfg.ReceiveEndpoint("user-created", e =>
                     {
+                        e.AutoDelete = false;
                         e.ConfigureConsumer<UserCreatedEventHandler>(context);
+                    });
+
+                    cfg.ReceiveEndpoint("users.company-registered-withowner", e =>
+                    {
+                        e.AutoDelete = false;
+                        e.ConfigureConsumer<CompanyRegisteredWithOwnerHandler>(context);
                     });
                 });
             });
 
             builder.Services.AddScoped<IUserLogic, UserLogic>();
-            builder.Services.AddControllers();
+            builder.Services.AddControllers(c =>
+            {
+                c.Filters.Add<ModelValidationFilter>();
+            });
             var app = builder.Build();
             app.UseMiddleware<GlobalExceptionHandler>();
             app.UseMiddleware<JwtAuthenticationMiddleware>();

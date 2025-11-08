@@ -60,12 +60,14 @@ services:
       dockerfile: TechTrack.OrganizationService/Dockerfile
     expose:
       - "8080"
+      - "8081"
     environment:
-      - ConnectionStrings__OrganizatinoServiceDbConnection=Host=postgres-organization;Database=organization_service;Username=postgres;Password=admin
+      - ConnectionStrings__OrganizationServiceDbConnection=Host=postgres-organization;Database=organization_service;Username=postgres;Password=admin
       - Jwt__AccessTokenKey=5c6dd372771c07a19980ce9ad6f251f3ea8f9974a85a943152a68906a2708f7d
       - Jwt__Issuer=http://auth-service
     depends_on:
       - postgres-organization
+      - rabbitmq
 
   auth-service:
     build:
@@ -79,6 +81,7 @@ services:
       - Jwt__Issuer=http://auth-service:8080
     depends_on:
       - postgres-auth
+      - rabbitmq
 
   user-service:
     build:
@@ -93,6 +96,8 @@ services:
       - Jwt__AccessTokenKey=5c6dd372771c07a19980ce9ad6f251f3ea8f9974a85a943152a68906a2708f7d
     depends_on:
       - postgres-user
+      - rabbitmq
+
 volumes:
   postgres_auth_data:
   postgres_user_data:
