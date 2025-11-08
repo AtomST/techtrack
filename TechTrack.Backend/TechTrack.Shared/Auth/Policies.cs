@@ -10,6 +10,7 @@ namespace TechTrack.Shared.Auth
     {
         public const string PlatformAdminAccess = "PlatformAdminAccess";
         public const string DevOnly = "DevOnly";
+        public const string CompanyHeadAccess = "CompanyHeadAccess";
         public const string AdminAccess = "AdminAccess";
         public const string ManagementAccess = "ManagementAccess";
         public const string SupervisorAccess = "SupervisorAccess";
