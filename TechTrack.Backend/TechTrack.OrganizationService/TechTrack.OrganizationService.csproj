@@ -24,8 +24,4 @@
     <ProjectReference Include="..\TechTrack.Shared\TechTrack.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Departments\Logic\" />
-  </ItemGroup>
-
 </Project>

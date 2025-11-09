@@ -14,15 +14,12 @@ namespace TechTrack.Shared.Auth
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("PlatformAdminAccess", policy =>
-                    policy.RequireRole(Roles.PlatformAdmin));
+                    policy.RequireRole(
+                        Roles.PlatformAdmin,
+                        Roles.Dev));
 
                 options.AddPolicy("DevOnly", policy =>
                     policy.RequireRole(Roles.Dev));
-
-                options.AddPolicy("AdminAccess", policy =>
-                    policy.RequireRole(
-                        Roles.Admin,
-                        Roles.Dev));
 
                 options.AddPolicy("CompanyHeadAccess", policy =>
                     policy.RequireRole(

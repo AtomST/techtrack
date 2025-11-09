@@ -6,6 +6,8 @@ using System.Text;
 using TechTrack.OrganizationService.Companies.Logic.Implementatios;
 using TechTrack.OrganizationService.Companies.Logic.Interfaces;
 using TechTrack.OrganizationService.Data;
+using TechTrack.OrganizationService.Departments.Logic.Implementations;
+using TechTrack.OrganizationService.Departments.Logic.Interfaces;
 using TechTrack.Shared.Auth;
 using TechTrack.Shared.Filters;
 using TechTrack.Shared.Logic;
@@ -40,6 +42,7 @@ namespace TechTrack.OrganizationService
                 });
             });
             builder.Services.AddScoped<ICompaniesLogic, CompaniesLogic>();
+            builder.Services.AddScoped<IDepartmentsLogic, DepartmentsLogic>();
 
             builder.Services.AddControllers(opt =>
             {

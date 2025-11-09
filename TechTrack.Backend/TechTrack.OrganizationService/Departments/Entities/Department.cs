@@ -9,7 +9,9 @@ namespace TechTrack.OrganizationService.Departments.Entities
         public string Name { get; set; }
 
         public Guid CompanyId { get; set; }
-        public Guid ResponsibleUserId { get; set; }
+        public Company? Company { get; set; }
+
+        public Guid? ResponsibleUserId { get; set; }
 
         public IList<Equipment> Equipments { get; set; } = new List<Equipment>();
 

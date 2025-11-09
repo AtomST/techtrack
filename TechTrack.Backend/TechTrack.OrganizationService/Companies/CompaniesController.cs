@@ -39,6 +39,8 @@ namespace TechTrack.OrganizationService.Companies
             });
         }
 
+
+
         //[HttpGet("{companyId:guid}")]
         //[Authorize(Roles = Policies.EmployeeAccess)]
         //public async Task<IActionResult> GetCompanyById()
