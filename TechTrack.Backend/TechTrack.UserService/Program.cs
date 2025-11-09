@@ -44,6 +44,7 @@ namespace TechTrack.UserService
             {
                 x.AddConsumer<UserCreatedEventHandler>();
                 x.AddConsumer<CompanyRegisteredWithOwnerHandler>();
+                x.AddConsumer<DepartmentCreatedWithHeadHandler>();
 
                 x.UsingRabbitMq((context, cfg) =>
                 {
@@ -63,6 +64,12 @@ namespace TechTrack.UserService
                     {
                         e.AutoDelete = false;
                         e.ConfigureConsumer<CompanyRegisteredWithOwnerHandler>(context);
+                    });
+
+                    cfg.ReceiveEndpoint("users.department-created-withhead", e =>
+                    {
+                        e.AutoDelete = false;
+                        e.ConfigureConsumer<DepartmentCreatedWithHeadHandler>(context);
                     });
                 });
             });

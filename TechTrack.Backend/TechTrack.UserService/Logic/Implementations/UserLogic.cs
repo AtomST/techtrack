@@ -54,5 +54,20 @@ namespace TechTrack.UserService.Logic.Implementations
                 RoleName = role,
             });
         }
+
+        public async Task ChangeUserRoleFromEvent(Guid userId, string roleName)
+        {
+            var user = _dbContext.Users.FirstOrDefault(u => u.Id == userId);
+            var role = _dbContext.Roles.FirstOrDefault(r => r.Name == roleName);
+
+            user.RoleId = role.Id;
+
+            await _dbContext.SaveChangesAsync();
+            await _publishEndpoint.Publish(new UserRoleChanged()
+            {
+                Id = user.Id,
+                RoleName = role.Name
+            });
+        }
     }
 }
