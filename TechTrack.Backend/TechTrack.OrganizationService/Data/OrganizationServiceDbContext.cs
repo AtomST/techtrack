@@ -15,8 +15,11 @@ namespace TechTrack.OrganizationService.Data
 
         public DbSet<Company> Companies { get; set; }
         public DbSet<CompanyUser> CompanyUser { get; set; }
+        public DbSet<EquipmentStatus> EquipmentStatuses { get; set; }
         public DbSet<Department> Departments { get; set; }
+        public DbSet<DepartmentUser> UserDepartments { get; set; }
         public DbSet<Equipment> Equipments { get; set; }
+
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -112,6 +115,23 @@ namespace TechTrack.OrganizationService.Data
                     .HasMany<Equipment>()
                     .WithOne(e => e.EquipmentStatus)
                     .HasForeignKey(e => e.CurrentStatusId);
+            });
+
+            modelBuilder.Entity<DepartmentUser>(entity =>
+            {
+                entity.ToTable("department_user");
+
+                entity.HasKey(e => e.UserId);
+
+                entity.Property(p => p.UserId)
+                    .HasColumnName("user_id")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.DepartmentId)
+                    .HasColumnName("department_id");
+                entity.Property(e => e.JoinedAt)
+                    .HasColumnName("joined_at");
+
             });
 
         }

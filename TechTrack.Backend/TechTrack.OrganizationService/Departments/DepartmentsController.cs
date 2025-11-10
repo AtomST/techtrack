@@ -44,5 +44,24 @@ namespace TechTrack.OrganizationService.Departments
             });
         }
 
+        [HttpGet("{departmentId}")]
+        [Authorize(Policy = Policies.EmployeeAccess)]
+        public async Task<IActionResult> GetFullDepartmentInfoById(Guid companyId,Guid departmentId)
+        {
+            User.AdditionalPolicyValidation(companyId);
+
+            var response = await _departmentsLogic.GetFullDepartmentInfoAsync(
+                departmentId,
+                User.GetPrincipalInfo()
+            );
+
+            return Ok(new SuccessResponse
+            {
+                StatusCode = System.Net.HttpStatusCode.OK,
+                Data = response.Department
+            });
+        }
+
+
     }
 }

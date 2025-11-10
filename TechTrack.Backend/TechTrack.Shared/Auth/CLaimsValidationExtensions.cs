@@ -11,13 +11,15 @@ namespace TechTrack.Shared.Auth
             ValidateUserPermission(info, companyId);
         }
 
-        private static UserPermissionInfo GetPrincipalInfo(ClaimsPrincipal user)
+        public static UserPermissionInfo GetPrincipalInfo(this ClaimsPrincipal user)
         {
+            var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
             var companyIdFromToken = user.FindFirstValue(CustomClaimTypes.CompanyId);
             var userRole = user.FindFirstValue(ClaimTypes.Role);
 
             return new UserPermissionInfo
             {
+                UserId = Guid.Parse(userId),
                 Role = userRole,
                 CompanyId = companyIdFromToken,
             };

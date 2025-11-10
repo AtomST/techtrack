@@ -6,10 +6,7 @@ using TechTrack.Shared.Events;
 using TechTrack.Shared.Exceptions;
 using TechTrack.Shared.Protos;
 using TechTrack.UserService.Data;
-using TechTrack.UserService.Data.Entities;
 using TechTrack.UserService.Logic.Interfaces;
-using TechTrack.UserService.Models;
-
 namespace TechTrack.UserService.Logic.Implementations
 {
     public class UserLogic : IUserLogic
@@ -26,7 +23,7 @@ namespace TechTrack.UserService.Logic.Implementations
             _publishEndpoint = publishEndpoint;
         }
 
-        public async Task ChangeUserRoleAsync(Guid userId, string role, UserPermissionInfo permissionInfo)
+        public async Task ChangeUserRoleAsync(Guid userId, string role, Models.UserPermissionInfo permissionInfo)
         {
             var user = _dbContext.Users.FirstOrDefault(u => u.Id == userId)
                 ?? throw new InvalidInputException("Пользователь с таким Id не найден");

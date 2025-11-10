@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TechTrack.OrganizationService.Data;
@@ -11,9 +12,11 @@ using TechTrack.OrganizationService.Data;
 namespace TechTrack.OrganizationService.Migrations
 {
     [DbContext(typeof(OrganizationServiceDbContext))]
-    partial class OrganizationServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251110072814_MakeEquipmentStatusDescNullable")]
+    partial class MakeEquipmentStatusDescNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -99,25 +102,6 @@ namespace TechTrack.OrganizationService.Migrations
                     b.HasIndex("CompanyId");
 
                     b.ToTable("departments", (string)null);
-                });
-
-            modelBuilder.Entity("TechTrack.OrganizationService.Departments.Entities.DepartmentUser", b =>
-                {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
-
-                    b.Property<Guid>("DepartmentId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("department_id");
-
-                    b.Property<DateTime>("JoinedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("joined_at");
-
-                    b.HasKey("UserId");
-
-                    b.ToTable("department_user", (string)null);
                 });
 
             modelBuilder.Entity("TechTrack.OrganizationService.Equipments.Entities.Equipment", b =>
