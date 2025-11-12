@@ -1,5 +1,6 @@
 ﻿using Grpc.Core;
 using Microsoft.EntityFrameworkCore;
+using TechTrack.Shared.Auth;
 using TechTrack.Shared.Protos;
 using TechTrack.UserService.Data;
 
@@ -25,12 +26,12 @@ namespace TechTrack.UserService.Logic.gRPC
                 ?? throw new RpcException(new Status
                 (
                     StatusCode.NotFound,
-                    "Пользователь с таким Id найден."
+                    "Пользователь с таким Id не найден."
                 ));
 
             return new GetRoleResponse
             {
-                UserRole = user.Role?.Name ?? "Undefined"
+                UserRole = user.Role?.Name ?? Roles.Undefined
             };
         }
     }

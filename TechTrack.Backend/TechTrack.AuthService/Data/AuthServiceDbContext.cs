@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using TechTrack.AuthService.Data.Entities;
+using TechTrack.Shared.Auth;
 
 namespace TechTrack.AuthService.Data
 {
@@ -12,6 +14,7 @@ namespace TechTrack.AuthService.Data
         }
 
         public DbSet<UserCredentials> UserCredentials { get; set; }
+        public DbSet<UserInfoCache> UserInfoCaches { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -69,6 +72,29 @@ namespace TechTrack.AuthService.Data
                 entity
                     .HasIndex(e => e.Token)
                     .IsUnique();
+            });
+
+            modelBuilder.Entity<UserInfoCache>(entity =>
+            {
+                entity.ToTable("user_info_cache");
+
+                entity.HasKey(u => u.UserId);
+
+                entity.Property(u => u.UserId)
+                    .HasColumnName("user_id")
+                    .ValueGeneratedNever();
+
+                entity.Property(u => u.RoleName)
+                    .HasColumnName("role_name")
+                    .HasDefaultValue(Roles.Undefined);
+
+                entity.Property(u => u.CompanyId)
+                    .HasColumnName("company_id");
+
+                entity
+                    .HasOne(u => u.UserCredentials)
+                    .WithOne(uc => uc.UserInfoCache)
+                    .HasForeignKey<UserInfoCache>(u => u.UserId);
             });
         }
     }

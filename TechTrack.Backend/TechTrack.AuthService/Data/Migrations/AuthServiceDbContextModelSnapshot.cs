@@ -76,6 +76,28 @@ namespace TechTrack.AuthService.Data.Migrations
                     b.ToTable("user_credentials", (string)null);
                 });
 
+            modelBuilder.Entity("TechTrack.AuthService.Data.Entities.UserInfoCache", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.Property<Guid?>("CompanyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("company_id");
+
+                    b.Property<string>("RoleName")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text")
+                        .HasDefaultValue("Undefined")
+                        .HasColumnName("role_name");
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("user_info_cache", (string)null);
+                });
+
             modelBuilder.Entity("TechTrack.AuthService.Data.Entities.RefreshToken", b =>
                 {
                     b.HasOne("TechTrack.AuthService.Data.Entities.UserCredentials", "UserCredentials")
@@ -87,9 +109,22 @@ namespace TechTrack.AuthService.Data.Migrations
                     b.Navigation("UserCredentials");
                 });
 
+            modelBuilder.Entity("TechTrack.AuthService.Data.Entities.UserInfoCache", b =>
+                {
+                    b.HasOne("TechTrack.AuthService.Data.Entities.UserCredentials", "UserCredentials")
+                        .WithOne("UserInfoCache")
+                        .HasForeignKey("TechTrack.AuthService.Data.Entities.UserInfoCache", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("UserCredentials");
+                });
+
             modelBuilder.Entity("TechTrack.AuthService.Data.Entities.UserCredentials", b =>
                 {
                     b.Navigation("RefreshTokens");
+
+                    b.Navigation("UserInfoCache");
                 });
 #pragma warning restore 612, 618
         }

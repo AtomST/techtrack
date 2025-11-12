@@ -9,6 +9,7 @@ namespace TechTrack.AuthService.Data.Entities
         public string Email { get; set; } = null!;
         public string Password { get; set; } = null!;
         public IList<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
+        public UserInfoCache? UserInfoCache { get; set; }
         
     }
 }

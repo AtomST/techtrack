@@ -1,3 +1,4 @@
+using TechTrack.Shared.Middleware;
 using Yarp.ReverseProxy;
 
 namespace TechTrack.ApiGateway
@@ -11,7 +12,7 @@ namespace TechTrack.ApiGateway
                 .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 
             var app = builder.Build();
-
+            app.UseMiddleware<GlobalExceptionHandler>();
 
             app.MapReverseProxy();
             app.UseAuthorization();

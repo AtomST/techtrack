@@ -38,6 +38,23 @@ namespace TechTrack.AuthService.Controllers
             });
         }
 
+        [HttpPost("register")]
+        public async Task<IActionResult> Register(RegisterDto registerDto)
+        {
+            var response = await _authLogic.RegisterAsync(registerDto);
+
+            SetRefreshToken(Response.Cookies, response.RefreshToken, response.RefreshTokenExpiredAt);
+
+            //201 in future
+            return Ok(new SuccessResponse()
+            {
+                StatusCode = HttpStatusCode.Created,
+                Data = new
+                {
+                    accessToken = response.AccessToken,
+                }
+            });
+        }
 
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
