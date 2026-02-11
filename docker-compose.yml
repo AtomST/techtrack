@@ -3,7 +3,7 @@ services:
   api-gateway:
     build:
       context: .
-      dockerfile: TechTrack.ApiGateway/Dockerfile
+      dockerfile: TechTrack.Backend/TechTrack.ApiGateway/Dockerfile
     ports:
       - "8080:8080"
 
@@ -57,7 +57,7 @@ services:
   organization-service:
     build:
       context: .
-      dockerfile: TechTrack.OrganizationService/Dockerfile
+      dockerfile: TechTrack.Backend/TechTrack.OrganizationService/Dockerfile
     expose:
       - "8080"
       - "8081"
@@ -72,7 +72,7 @@ services:
   auth-service:
     build:
       context: .
-      dockerfile: TechTrack.AuthService/Dockerfile
+      dockerfile: TechTrack.Backend/TechTrack.AuthService/Dockerfile
     expose:
       - "8080" # REST(HTTP/1.1)
       - "8081" # gRPC(HTTP/2)
@@ -86,7 +86,7 @@ services:
   user-service:
     build:
       context: .
-      dockerfile: TechTrack.UserService/Dockerfile
+      dockerfile: TechTrack.Backend/TechTrack.UserService/Dockerfile
     expose:
       - "8080"
       - "8081"
@@ -97,8 +97,18 @@ services:
     depends_on:
       - postgres-user
       - rabbitmq
+  
+  frontend:
+    build:
+      context: TechTrack.Frontend
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+    volumes:
+      - frontend_data:/var/lib/frontend/data
 
 volumes:
+  frontend_data:
   postgres_auth_data:
   postgres_user_data:
   postgres_organization_data:

@@ -2,8 +2,8 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # Copy both projects
-COPY TechTrack.Shared/ ./TechTrack.Shared/
-COPY TechTrack.AuthService/ ./TechTrack.AuthService/
+COPY TechTrack.Backend/TechTrack.Shared/ ./TechTrack.Shared/
+COPY TechTrack.Backend/TechTrack.AuthService/ ./TechTrack.AuthService/
 
 # Build with correct paths
 RUN dotnet build "TechTrack.AuthService/TechTrack.AuthService.csproj" -c http

@@ -2,8 +2,8 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # Copy both projects
-COPY TechTrack.Shared/ ./TechTrack.Shared/
-COPY TechTrack.UserService/ ./TechTrack.UserService/
+COPY TechTrack.Backend/TechTrack.Shared/ ./TechTrack.Shared/
+COPY TechTrack.Backend/TechTrack.UserService/ ./TechTrack.UserService/
 
 # Build with correct paths
 RUN dotnet build "TechTrack.UserService/TechTrack.UserService.csproj" -c http
