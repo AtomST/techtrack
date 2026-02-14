@@ -1,40 +1,32 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import { useAuthStore } from '@/store/auth.store';
+import { useAuth } from '@/hooks/useAuth';
 import { departmentService } from '@/services/department.service';
-import { equipmentService } from '@/services/equipment.service';
 import { issueService } from '@/services/issue-maintenance.service';
+import { withAuth } from '@/components/withAuth';
 import { Sidebar } from '@/components/sidebar';
 import { EquipmentDetail } from '@/components/equipment-detail';
-import { Equipment, Department } from '@/types';
+import { Equipment } from '@/types';
 import { Button } from '@/components/ui/button';
 import { LogOut, Settings, Building2 } from 'lucide-react';
 
-export default function DashboardPage() {
+function DashboardPage() {
   const router = useRouter();
-  const { user, isAuthenticated, isLoading: authLoading, logout } = useAuthStore();
+  const { user, logout } = useAuth();
   const [selectedEquipment, setSelectedEquipment] = useState<Equipment | null>(null);
 
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      router.push('/login');
-    }
-  }, [isAuthenticated, authLoading, router]);
-
-  // Fetch departments
-  const { data: departmentsResponse, isLoading: departmentsLoading } = useQuery({
+  // Fetch departments (no need to check isLoading/isAuthenticated - HOC handles it)
+  const { data: departments = [] } = useQuery({
     queryKey: ['departments', user?.companyId],
     queryFn: () => departmentService.getDepartments(user?.companyId),
     enabled: !!user?.companyId,
   });
 
-  const departments = departmentsResponse || [];
-
   // Fetch equipment for all departments
-  const { data: equipmentByDepartment = {}, isLoading: equipmentLoading } = useQuery({
+  const { data: equipmentByDepartment = {} } = useQuery({
     queryKey: ['equipment', user?.companyId, departments],
     queryFn: async () => {
       if (!user?.companyId || !departments.length) return {};
@@ -42,7 +34,6 @@ export default function DashboardPage() {
       const result: Record<string, Equipment[]> = {};
       
       for (const dept of departments) {
-        // Equipment уже есть в Department.equipments
         result[dept.id] = dept.equipments || [];
       }
       
@@ -52,46 +43,16 @@ export default function DashboardPage() {
   });
 
   // Fetch issues for selected equipment
-  const { data: issuesResponse } = useQuery({
+  const { data: issues = [] } = useQuery({
     queryKey: ['issues', selectedEquipment?.id],
     queryFn: () => issueService.getIssues(selectedEquipment!.id),
     enabled: !!selectedEquipment,
   });
 
-  const issues = issuesResponse || [];
-
   const handleLogout = async () => {
     await logout();
     router.push('/login');
   };
-
-  if (authLoading || !isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-muted-foreground">Загрузка...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!user?.companyId) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center max-w-md">
-          <Building2 className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-          <h2 className="text-2xl font-bold mb-2">Компания не найдена</h2>
-          <p className="text-muted-foreground mb-6">
-            Вы не привязаны ни к одной компании. Обратитесь к администратору.
-          </p>
-          <Button onClick={handleLogout}>
-            Выйти
-          </Button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="h-screen flex flex-col">
@@ -101,7 +62,7 @@ export default function DashboardPage() {
           <div>
             <h1 className="text-2xl font-bold">TechTrack</h1>
             <p className="text-sm text-muted-foreground">
-              {user.fullName || user.email}
+              {user?.fullName || user?.email}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -144,3 +105,6 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+// Wrap with auth protection that requires company
+export default withAuth(DashboardPage, { requireCompany: true });

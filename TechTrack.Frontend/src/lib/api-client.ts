@@ -140,6 +140,8 @@ class ApiClient {
     if (typeof window !== 'undefined') {
       sessionStorage.removeItem('accessToken');
       sessionStorage.removeItem('user');
+      sessionStorage.removeItem('userEmail');
+      sessionStorage.removeItem('userFullName');
     }
   }
 

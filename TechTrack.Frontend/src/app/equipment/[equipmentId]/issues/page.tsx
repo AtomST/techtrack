@@ -3,13 +3,14 @@
 import { useRouter, useParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { issueService } from '@/services/issue-maintenance.service';
+import { withAuth } from '@/components/withAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Plus } from 'lucide-react';
 import { getStatusColor, getSeverityColor, formatDateTime } from '@/lib/utils';
 
-export default function IssuesPage() {
+function IssuesPage() {
   const router = useRouter();
   const params = useParams();
   const equipmentId = params.equipmentId as string;
@@ -116,3 +117,5 @@ export default function IssuesPage() {
     </div>
   );
 }
+
+export default withAuth(IssuesPage);

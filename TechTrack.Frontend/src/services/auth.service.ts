@@ -50,11 +50,12 @@ export const authService = {
       throw new Error('Invalid token');
     }
     
-    // Store ONLY accessToken in memory/sessionStorage (not localStorage for security)
+    // Store ONLY accessToken in sessionStorage (not localStorage for security)
     // httpOnly refresh token is automatically stored in cookies by browser
     if (typeof window !== 'undefined') {
       sessionStorage.setItem('accessToken', accessToken);
       sessionStorage.setItem('user', JSON.stringify(user));
+      sessionStorage.setItem('userEmail', credentials.email); // For refresh recovery
     }
     
     return { user, accessToken };
@@ -83,6 +84,8 @@ export const authService = {
     if (typeof window !== 'undefined') {
       sessionStorage.setItem('accessToken', accessToken);
       sessionStorage.setItem('user', JSON.stringify(user));
+      sessionStorage.setItem('userEmail', data.email); // For refresh recovery
+      sessionStorage.setItem('userFullName', data.FullName); // For refresh recovery
     }
     
     return { user, accessToken };
@@ -102,6 +105,16 @@ export const authService = {
     
     if (typeof window !== 'undefined') {
       sessionStorage.setItem('accessToken', accessToken);
+      
+      // Decode token and reconstruct user
+      const email = sessionStorage.getItem('userEmail') || '';
+      const fullName = sessionStorage.getItem('userFullName') || '';
+      
+      const user = getUserFromToken(accessToken, email);
+      if (user) {
+        user.fullName = fullName;
+        sessionStorage.setItem('user', JSON.stringify(user));
+      }
     }
     
     return accessToken;
@@ -116,6 +129,8 @@ export const authService = {
       if (typeof window !== 'undefined') {
         sessionStorage.removeItem('accessToken');
         sessionStorage.removeItem('user');
+        sessionStorage.removeItem('userEmail');
+        sessionStorage.removeItem('userFullName');
       }
     }
   },
@@ -129,6 +144,8 @@ export const authService = {
       if (typeof window !== 'undefined') {
         sessionStorage.removeItem('accessToken');
         sessionStorage.removeItem('user');
+        sessionStorage.removeItem('userEmail');
+        sessionStorage.removeItem('userFullName');
       }
     }
   },

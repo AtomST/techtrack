@@ -3,13 +3,14 @@
 import { useRouter, useParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { maintenanceService } from '@/services/issue-maintenance.service';
+import { withAuth } from '@/components/withAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Plus, Calendar } from 'lucide-react';
 import { getStatusColor, formatDate, formatDateTime } from '@/lib/utils';
 
-export default function MaintenancePage() {
+function MaintenancePage() {
   const router = useRouter();
   const params = useParams();
   const equipmentId = params.equipmentId as string;
@@ -185,3 +186,5 @@ export default function MaintenancePage() {
     </div>
   );
 }
+
+export default withAuth(MaintenancePage);
