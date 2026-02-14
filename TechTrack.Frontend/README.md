@@ -1,36 +1,187 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TechTrack Frontend
 
-## Getting Started
+Современный фронтенд для системы управления техникой TechTrack, построенный на Next.js 15.
 
-First, run the development server:
+## Технологический стек
+
+- **Next.js 15** - React фреймворк с App Router
+- **TypeScript** - Типизация
+- **Tailwind CSS** - Утилитарные стили
+- **Zustand** - Управление состоянием
+- **React Query** - Работа с данными и кэширование
+- **Axios** - HTTP клиент
+
+## Структура проекта
+
+```
+src/
+├── app/                    # Next.js App Router страницы
+│   ├── dashboard/         # Главная страница дашборда
+│   ├── login/            # Страница входа
+│   ├── register/         # Страница регистрации
+│   ├── layout.tsx        # Корневой layout
+│   ├── page.tsx          # Главная страница (редирект)
+│   └── providers.tsx     # React Query провайдер
+├── components/            # React компоненты
+│   ├── ui/               # Базовые UI компоненты
+│   ├── sidebar.tsx       # Боковая панель с отделами
+│   └── equipment-detail.tsx  # Детали оборудования
+├── services/             # API сервисы
+│   ├── auth.service.ts
+│   ├── company.service.ts
+│   ├── department.service.ts
+│   ├── equipment.service.ts
+│   └── issue-maintenance.service.ts
+├── store/                # Zustand хранилища
+│   └── auth.store.ts
+├── types/                # TypeScript типы
+│   └── index.ts
+└── lib/                  # Утилиты
+    ├── api-client.ts     # Настроенный Axios клиент
+    └── utils.ts          # Вспомогательные функции
+```
+
+## Установка и запуск
+
+### Предварительные требования
+
+- Node.js 18+
+- npm или yarn
+
+### Установка зависимостей
+
+```bash
+npm install
+```
+
+### Настройка переменных окружения
+
+Создайте файл `.env.local` в корне проекта:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8080
+```
+
+### Запуск в режиме разработки
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Приложение будет доступно по адресу [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Сборка для production
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm start
+```
 
-## Learn More
+## Основные возможности
 
-To learn more about Next.js, take a look at the following resources:
+### Аутентификация
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Регистрация новых пользователей
+- Вход в систему
+- Автоматическое обновление токенов
+- Выход из системы
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Управление техникой
 
-## Deploy on Vercel
+- Просмотр отделов компании
+- Просмотр техники по отделам
+- Детальная информация об оборудовании
+- Отслеживание статуса техники
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Неисправности
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Просмотр текущих неисправностей
+- Список всех неисправностей по технике
+- Добавление новых неисправностей
+- Отслеживание приоритета и статуса
+
+### Техническое обслуживание
+
+- Журнал ТО для каждой единицы техники
+- Планирование обслуживания
+- История выполненных работ
+
+## API Интеграция
+
+Фронтенд интегрируется с бэкенд API через следующие эндпоинты:
+
+### Аутентификация
+- `POST /api/auth/login` - Вход
+- `POST /api/auth/register` - Регистрация
+- `POST /api/auth/refresh` - Обновление токена
+- `POST /api/auth/logout` - Выход
+
+### Компании
+- `GET/POST /api/companies` - Список/создание компаний
+
+### Отделы
+- `GET/POST /api/companies/departments` - Список/создание отделов
+
+### Оборудование
+- `GET/POST /api/companies/{companyId}/departments/{departmentId}/equipments` - Оборудование отдела
+
+## Особенности реализации
+
+### Автоматическое обновление токенов
+
+API клиент автоматически перехватывает 401 ошибки и обновляет access token используя refresh token.
+
+### Кэширование данных
+
+React Query автоматически кэширует данные и управляет их обновлением, что уменьшает количество запросов к серверу.
+
+### Типобезопасность
+
+Все API запросы и ответы типизированы с использованием TypeScript интерфейсов.
+
+### Адаптивный дизайн
+
+Интерфейс адаптирован для различных размеров экранов с использованием Tailwind CSS.
+
+## Дальнейшее развитие
+
+Планируется добавление следующего функционала:
+
+- [ ] Создание и редактирование отделов
+- [ ] Добавление и редактирование оборудования
+- [ ] Полноценные формы создания неисправностей
+- [ ] Страницы списка всех неисправностей и ТО
+- [ ] Фильтрация и поиск
+- [ ] Уведомления
+- [ ] Экспорт данных
+- [ ] Дашборд с аналитикой
+- [ ] Управление пользователями и ролями
+- [ ] Мобильная версия
+
+## Разработка
+
+### Добавление новых компонентов
+
+```bash
+# Создайте компонент в src/components/
+# Используйте TypeScript и React hooks
+```
+
+### Добавление новых страниц
+
+```bash
+# Создайте папку в src/app/ с файлом page.tsx
+# Next.js автоматически создаст роут
+```
+
+### Работа с API
+
+```typescript
+// Добавьте новый сервис в src/services/
+// Используйте apiClient для запросов
+// Определите типы в src/types/
+```
+
+## Лицензия
+
+MIT
