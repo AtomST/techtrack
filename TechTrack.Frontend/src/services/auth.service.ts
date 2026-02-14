@@ -35,7 +35,9 @@ function getUserFromToken(token: string, email: string): User | null {
 
 export const authService = {
   async login(credentials: LoginRequest): Promise<{ user: User; accessToken: string }> {
-    const response = await apiClient.post<AuthResponse>('/api/auth/login', credentials);
+    const response = await apiClient.post<AuthResponse>('/api/auth/login', credentials, {
+      withCredentials: true, // Important! Allows httpOnly cookies
+    });
     
     if (response.data.statusCode !== 200) {
       throw new Error('Login failed');
@@ -48,17 +50,20 @@ export const authService = {
       throw new Error('Invalid token');
     }
     
-    // Store token and user
+    // Store ONLY accessToken in memory/sessionStorage (not localStorage for security)
+    // httpOnly refresh token is automatically stored in cookies by browser
     if (typeof window !== 'undefined') {
-      localStorage.setItem('accessToken', accessToken);
-      localStorage.setItem('user', JSON.stringify(user));
+      sessionStorage.setItem('accessToken', accessToken);
+      sessionStorage.setItem('user', JSON.stringify(user));
     }
     
     return { user, accessToken };
   },
 
   async register(data: RegisterRequest): Promise<{ user: User; accessToken: string }> {
-    const response = await apiClient.post<AuthResponse>('/api/auth/register', data);
+    const response = await apiClient.post<AuthResponse>('/api/auth/register', data, {
+      withCredentials: true, // Important! Allows httpOnly cookies
+    });
     
     if (response.data.statusCode !== 200) {
       throw new Error('Registration failed');
@@ -74,56 +79,74 @@ export const authService = {
     // Update user's fullName from registration data
     user.fullName = data.FullName;
     
-    // Store token and user
+    // Store in sessionStorage
     if (typeof window !== 'undefined') {
-      localStorage.setItem('accessToken', accessToken);
-      localStorage.setItem('user', JSON.stringify(user));
+      sessionStorage.setItem('accessToken', accessToken);
+      sessionStorage.setItem('user', JSON.stringify(user));
     }
     
     return { user, accessToken };
   },
 
-  async refresh(refreshToken: string): Promise<{ accessToken: string }> {
-    const response = await apiClient.post('/api/auth/refresh', { refreshToken });
+  async refresh(): Promise<string> {
+    // Refresh token is automatically sent via httpOnly cookie
+    const response = await apiClient.post<AuthResponse>('/api/auth/refresh', {}, {
+      withCredentials: true, // Send httpOnly cookie
+    });
+    
+    if (response.data.statusCode !== 200) {
+      throw new Error('Token refresh failed');
+    }
+
+    const accessToken = response.data.data.accessToken;
     
     if (typeof window !== 'undefined') {
-      localStorage.setItem('accessToken', response.data.accessToken);
+      sessionStorage.setItem('accessToken', accessToken);
     }
     
-    return response.data;
+    return accessToken;
   },
 
   async logout(): Promise<void> {
     try {
-      await apiClient.post('/api/auth/logout');
+      await apiClient.post('/api/auth/logout', {}, {
+        withCredentials: true, // Send httpOnly cookie to invalidate it
+      });
     } finally {
       if (typeof window !== 'undefined') {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('user');
+        sessionStorage.removeItem('accessToken');
+        sessionStorage.removeItem('user');
       }
     }
   },
 
   async logoutAll(): Promise<void> {
     try {
-      await apiClient.post('/api/auth/logout-all');
+      await apiClient.post('/api/auth/logout-all', {}, {
+        withCredentials: true,
+      });
     } finally {
       if (typeof window !== 'undefined') {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('user');
+        sessionStorage.removeItem('accessToken');
+        sessionStorage.removeItem('user');
       }
     }
   },
 
   getCurrentUser(): User | null {
     if (typeof window === 'undefined') return null;
-    const userStr = localStorage.getItem('user');
+    const userStr = sessionStorage.getItem('user');
     return userStr ? JSON.parse(userStr) : null;
+  },
+
+  getAccessToken(): string | null {
+    if (typeof window === 'undefined') return null;
+    return sessionStorage.getItem('accessToken');
   },
 
   isAuthenticated(): boolean {
     if (typeof window === 'undefined') return false;
-    const token = localStorage.getItem('accessToken');
+    const token = sessionStorage.getItem('accessToken');
     if (!token) return false;
 
     // Check if token is expired
