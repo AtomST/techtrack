@@ -24,6 +24,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   initialize: async () => {
+    console.log('[Auth Store] Initializing...');
+    
     try {
       // Проверяем наличие accessToken в sessionStorage
       const user = authService.getCurrentUser();
@@ -31,32 +33,20 @@ export const useAuthStore = create<AuthState>((set) => ({
 
       if (isAuthenticated && user) {
         // AccessToken еще валиден
+        console.log('[Auth Store] Valid access token found');
         set({ user, isAuthenticated: true, isLoading: false });
         return;
       }
 
-      // AccessToken истек или отсутствует, пробуем обновить через refresh token
-      if (typeof window !== 'undefined') {
-        try {
-          const newAccessToken = await authService.refresh();
-          
-          // Декодируем новый токен для получения пользователя
-          const refreshedUser = authService.getCurrentUser();
-          
-          if (refreshedUser) {
-            set({ user: refreshedUser, isAuthenticated: true, isLoading: false });
-            return;
-          }
-        } catch (refreshError) {
-          // Refresh token тоже истек или невалиден
-          console.log('Refresh token expired or invalid');
-        }
-      }
-
-      // Нет валидных токенов
+      console.log('[Auth Store] No valid access token, checking for refresh token...');
+      
+      // НЕ вызываем refresh автоматически!
+      // Пусть первый 401 запрос вызовет refresh через interceptor
+      // Это избежит лишних запросов при отсутствии refresh cookie
+      
       set({ user: null, isAuthenticated: false, isLoading: false });
     } catch (error) {
-      console.error('Auth initialization error:', error);
+      console.error('[Auth Store] Initialization error:', error);
       set({ user: null, isAuthenticated: false, isLoading: false });
     }
   },

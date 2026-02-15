@@ -5,6 +5,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 class ApiClient {
   private client: AxiosInstance;
   private isRefreshing = false;
+  private refreshAttempted = false; // NEW: Track if we already tried to refresh
   private failedQueue: Array<{
     resolve: (value?: any) => void;
     reject: (reason?: any) => void;
@@ -51,12 +52,46 @@ class ApiClient {
 
     // Response interceptor with refresh token logic
     this.client.interceptors.response.use(
-      (response) => response,
+      (response) => {
+        // Reset refresh flag on successful request
+        this.refreshAttempted = false;
+        return response;
+      },
       async (error: AxiosError) => {
         const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
         // If error is 401 and we haven't retried yet
         if (error.response?.status === 401 && !originalRequest._retry) {
+          // Check if this is the refresh endpoint itself failing
+          if (originalRequest.url?.includes('/api/auth/refresh')) {
+            // Refresh endpoint failed - clear tokens and redirect
+            console.log('Refresh token invalid or expired');
+            this.clearTokens();
+            this.refreshAttempted = false;
+            this.isRefreshing = false;
+            
+            if (typeof window !== 'undefined') {
+              window.location.href = '/login';
+            }
+            
+            return Promise.reject(error);
+          }
+
+          // Check if we already attempted refresh in this session
+          if (this.refreshAttempted) {
+            // Already tried to refresh and still getting 401
+            // This means refresh token is invalid
+            console.log('Refresh already attempted but still unauthorized');
+            this.clearTokens();
+            this.refreshAttempted = false;
+            
+            if (typeof window !== 'undefined') {
+              window.location.href = '/login';
+            }
+            
+            return Promise.reject(error);
+          }
+
           if (this.isRefreshing) {
             // If already refreshing, queue this request
             return new Promise((resolve, reject) => {
@@ -75,6 +110,7 @@ class ApiClient {
 
           originalRequest._retry = true;
           this.isRefreshing = true;
+          this.refreshAttempted = true; // Mark that we attempted refresh
 
           try {
             // Call refresh endpoint (refresh token sent automatically via httpOnly cookie)
@@ -107,6 +143,7 @@ class ApiClient {
             }
           } catch (refreshError) {
             // Refresh failed, logout user
+            console.log('Refresh token request failed:', refreshError);
             this.processQueue(refreshError, null);
             this.clearTokens();
             
@@ -143,6 +180,7 @@ class ApiClient {
       sessionStorage.removeItem('userEmail');
       sessionStorage.removeItem('userFullName');
     }
+    this.refreshAttempted = false;
   }
 
   public getClient(): AxiosInstance {

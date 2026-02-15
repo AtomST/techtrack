@@ -92,32 +92,45 @@ export const authService = {
   },
 
   async refresh(): Promise<string> {
-    // Refresh token is automatically sent via httpOnly cookie
-    const response = await apiClient.post<AuthResponse>('/api/auth/refresh', {}, {
-      withCredentials: true, // Send httpOnly cookie
-    });
-    
-    if (response.data.statusCode !== 200) {
-      throw new Error('Token refresh failed');
-    }
-
-    const accessToken = response.data.data.accessToken;
-    
-    if (typeof window !== 'undefined') {
-      sessionStorage.setItem('accessToken', accessToken);
+    try {
+      // Refresh token is automatically sent via httpOnly cookie
+      const response = await apiClient.post<AuthResponse>('/api/auth/refresh', {}, {
+        withCredentials: true, // Send httpOnly cookie
+      });
       
-      // Decode token and reconstruct user
-      const email = sessionStorage.getItem('userEmail') || '';
-      const fullName = sessionStorage.getItem('userFullName') || '';
-      
-      const user = getUserFromToken(accessToken, email);
-      if (user) {
-        user.fullName = fullName;
-        sessionStorage.setItem('user', JSON.stringify(user));
+      if (response.data.statusCode !== 200) {
+        throw new Error('Token refresh failed');
       }
+
+      const accessToken = response.data.data.accessToken;
+      
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('accessToken', accessToken);
+        
+        // Decode token and reconstruct user
+        const email = sessionStorage.getItem('userEmail') || '';
+        const fullName = sessionStorage.getItem('userFullName') || '';
+        
+        const user = getUserFromToken(accessToken, email);
+        if (user) {
+          user.fullName = fullName;
+          sessionStorage.setItem('user', JSON.stringify(user));
+        }
+      }
+      
+      return accessToken;
+    } catch (error: any) {
+      // Clear tokens on refresh failure
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('accessToken');
+        sessionStorage.removeItem('user');
+        sessionStorage.removeItem('userEmail');
+        sessionStorage.removeItem('userFullName');
+      }
+      
+      // Re-throw to let caller handle
+      throw new Error('Refresh token invalid or expired');
     }
-    
-    return accessToken;
   },
 
   async logout(): Promise<void> {
