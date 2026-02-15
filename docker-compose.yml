@@ -54,6 +54,17 @@ services:
     ports:
       - "5434:5432"
   
+  postgres-maintenance:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: maintenance_service
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    volumes:
+      - postgres_maintenance_data:/var/lib/postgresql/data
+    ports:
+      - "5435:5432"
+  
   organization-service:
     build:
       context: .
@@ -97,7 +108,22 @@ services:
     depends_on:
       - postgres-user
       - rabbitmq
-  
+
+  maintenance-service:
+    build:
+      context: .
+      dockerfile: TechTrack.Backend/TechTrack.MaintenanceService/Dockerfile
+    expose:
+      - "8080"
+      - "8081"
+    environment:
+      - ConnectionStrings__UserServiceDbConnection=Host=postgres-user;Database=user_service;Username=postgres;Password=admin
+      - Jwt__Issuer=http://auth-service:8080
+      - Jwt__AccessTokenKey=5c6dd372771c07a19980ce9ad6f251f3ea8f9974a85a943152a68906a2708f7d
+    depends_on:
+      - postgres-maintenance
+      - rabbitmq
+
   frontend:
     build:
       context: TechTrack.Frontend
@@ -112,4 +138,5 @@ volumes:
   postgres_auth_data:
   postgres_user_data:
   postgres_organization_data:
+  postgres_maintenance_data:
   rabbitmq_data:

@@ -14,7 +14,7 @@ namespace TechTrack.ApiGateway
             {
                 options.AddPolicy("AllowFrontend", policy =>
                 {
-                    policy.SetIsOriginAllowed(origin => true) // Разрешить любой origin в Development
+                    policy.SetIsOriginAllowed(origin => true)
                           .AllowAnyHeader()
                           .AllowAnyMethod()
                           .AllowCredentials();
