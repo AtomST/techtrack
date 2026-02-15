@@ -14,8 +14,6 @@ namespace TechTrack.OrganizationService.Departments.Entities
         public Guid? ResponsibleUserId { get; set; }
 
         public IList<Equipment> Equipments { get; set; } = new List<Equipment>();
-
-
-
+        public IList<DepartmentUser> DepartmentEmployees { get; set; } = new List<DepartmentUser>();
     }
 }

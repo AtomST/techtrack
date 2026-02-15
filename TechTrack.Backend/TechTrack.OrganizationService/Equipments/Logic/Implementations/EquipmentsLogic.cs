@@ -5,6 +5,8 @@ using TechTrack.OrganizationService.Equipments.Entities;
 using TechTrack.OrganizationService.Equipments.Logic.Interfaces;
 using TechTrack.OrganizationService.Equipments.Models.Requests;
 using TechTrack.OrganizationService.Equipments.Models.Responses;
+using TechTrack.Shared.Auth;
+using TechTrack.Shared.Exceptions;
 
 namespace TechTrack.OrganizationService.Equipments.Logic.Implementations
 {
@@ -47,6 +49,25 @@ namespace TechTrack.OrganizationService.Equipments.Logic.Implementations
             await _dbContext.SaveChangesAsync();
 
             return new AddEquipmentResponse { EquipmentId = equipment.Id };
+        }
+
+        public async Task<GetAllEquipmentsResponse> GetAllEquipmentsAsync(Guid departmentId, UserPermissionInfo userPermissionInfo)
+        {
+            if(userPermissionInfo.Role == Roles.Employee || userPermissionInfo.Role == null)
+            {
+                var isDepartmentEmployee = await _dbContext.UserDepartments
+                    .Where(ud => ud.DepartmentId == departmentId && ud.UserId == userPermissionInfo.UserId)
+                    .AnyAsync();
+
+                if (!isDepartmentEmployee)
+                    throw new ForbiddenException("Вы не сотрудник этого отдела");
+            }
+            var equipments = await _dbContext.Equipments
+                .AsNoTracking()
+                .Where(e => e.DepartmentId == departmentId)
+                .ToListAsync();
+
+            return new GetAllEquipmentsResponse { Equipments = equipments };
         }
 
         private string GenerateEquipmentPostfix(IList<string> names, string baseName)
