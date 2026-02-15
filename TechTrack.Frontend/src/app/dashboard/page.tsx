@@ -25,23 +25,6 @@ function DashboardPage() {
     enabled: !!user?.companyId,
   });
 
-  // Fetch equipment for all departments
-  const { data: equipmentByDepartment = {} } = useQuery({
-    queryKey: ['equipment', user?.companyId, departments],
-    queryFn: async () => {
-      if (!user?.companyId || !departments.length) return {};
-      
-      const result: Record<string, Equipment[]> = {};
-      
-      for (const dept of departments) {
-        result[dept.id] = dept.equipments || [];
-      }
-      
-      return result;
-    },
-    enabled: !!user?.companyId && departments.length > 0,
-  });
-
   // Fetch issues for selected equipment
   const { data: issues = [] } = useQuery({
     queryKey: ['issues', selectedEquipment?.id],
@@ -80,7 +63,6 @@ function DashboardPage() {
       <div className="flex-1 flex overflow-hidden">
         <Sidebar
           departments={departments}
-          equipmentByDepartment={equipmentByDepartment}
           selectedEquipment={selectedEquipment}
           onEquipmentSelect={setSelectedEquipment}
         />

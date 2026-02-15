@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { apiClient } from '@/lib/api-client';
 import { LoginRequest, RegisterRequest, AuthResponse, User, UserRole } from '@/types';
 
@@ -50,12 +51,12 @@ export const authService = {
       throw new Error('Invalid token');
     }
     
-    // Store ONLY accessToken in sessionStorage (not localStorage for security)
-    // httpOnly refresh token is automatically stored in cookies by browser
+    // Store tokens and user data for refresh recovery
     if (typeof window !== 'undefined') {
       sessionStorage.setItem('accessToken', accessToken);
       sessionStorage.setItem('user', JSON.stringify(user));
-      sessionStorage.setItem('userEmail', credentials.email); // For refresh recovery
+      sessionStorage.setItem('userEmail', credentials.email);
+      sessionStorage.setItem('userFullName', user.fullName || ''); // Save for refresh
     }
     
     return { user, accessToken };
@@ -92,34 +93,69 @@ export const authService = {
   },
 
   async refresh(): Promise<string> {
+    console.log('[Auth Service] Starting refresh...');
+    
     try {
-      // Refresh token is automatically sent via httpOnly cookie
-      const response = await apiClient.post<AuthResponse>('/api/auth/refresh', {}, {
-        withCredentials: true, // Send httpOnly cookie
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+      const refreshUrl = `${API_URL}/api/auth/refresh`;
+      
+      console.log('[Auth Service] Refresh URL:', refreshUrl);
+      
+      // IMPORTANT: Use vanilla axios, NOT apiClient, to avoid triggering interceptor
+      const response = await axios.post<AuthResponse>(
+        refreshUrl,
+        {},
+        {
+          withCredentials: true, // Send httpOnly cookie
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      
+      console.log('[Auth Service] Refresh response:', {
+        status: response.status,
+        statusCode: response.data?.statusCode,
+        hasAccessToken: !!response.data?.data?.accessToken,
       });
       
       if (response.data.statusCode !== 200) {
-        throw new Error('Token refresh failed');
+        throw new Error('Token refresh failed - invalid status code');
       }
 
       const accessToken = response.data.data.accessToken;
       
+      if (!accessToken) {
+        throw new Error('Token refresh failed - no accessToken in response');
+      }
+      
+      console.log('[Auth Service] Got new accessToken:', accessToken.substring(0, 20) + '...');
+      
       if (typeof window !== 'undefined') {
         sessionStorage.setItem('accessToken', accessToken);
+        console.log('[Auth Service] Saved accessToken to sessionStorage');
         
         // Decode token and reconstruct user
         const email = sessionStorage.getItem('userEmail') || '';
         const fullName = sessionStorage.getItem('userFullName') || '';
         
+        console.log('[Auth Service] Reconstructing user with email:', email);
+        
         const user = getUserFromToken(accessToken, email);
         if (user) {
           user.fullName = fullName;
           sessionStorage.setItem('user', JSON.stringify(user));
+          console.log('[Auth Service] User reconstructed:', user);
+        } else {
+          console.error('[Auth Service] Failed to decode token');
         }
       }
       
+      console.log('[Auth Service] Refresh successful!');
       return accessToken;
     } catch (error: any) {
+      console.error('[Auth Service] Refresh error:', error.message, error.response?.data);
+      
       // Clear tokens on refresh failure
       if (typeof window !== 'undefined') {
         sessionStorage.removeItem('accessToken');
@@ -129,7 +165,7 @@ export const authService = {
       }
       
       // Re-throw to let caller handle
-      throw new Error('Refresh token invalid or expired');
+      throw new Error(`Refresh token invalid or expired: ${error.message}`);
     }
   },
 
