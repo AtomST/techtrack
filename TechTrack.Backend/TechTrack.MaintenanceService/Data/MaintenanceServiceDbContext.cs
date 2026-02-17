@@ -1,0 +1,68 @@
+﻿using Microsoft.EntityFrameworkCore;
+using TechTrack.MaintenanceService.Issues.Entities;
+using TechTrack.OrganizationService.Equipments.Entities;
+
+namespace TechTrack.MaintenanceService.Data
+{
+    public class MaintenanceServiceDbContext : DbContext
+    {
+        private IConfiguration _configuratoin;
+        public MaintenanceServiceDbContext(DbContextOptions<MaintenanceServiceDbContext> options, IConfiguration configuration) : base(options)
+        {
+            _configuratoin = configuration;
+        }
+
+        public DbSet<Issue> Issues { get; set; }
+        public DbSet<EquipmentStatus> EquipmentStatuses { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if(!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseNpgsql(_configuratoin.GetConnectionString("MaintenanceServiceDbConnection"));
+            }
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Issue>(entity =>
+            {
+                entity.ToTable("issues");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("id");
+                entity.Property(e => e.Name)
+                    .HasColumnName("name");
+                entity.Property(e => e.Description)
+                    .HasColumnName("description");
+                entity.Property(e => e.StatusId)
+                    .HasColumnName("status_id");
+                entity.Property(e => e.CreatorId)
+                    .HasColumnName("creator_id");
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnName("created_at")
+                    .HasColumnType("timestamp with time zone");
+                entity.Property(e => e.EquipmentId)
+                    .HasColumnName("equipment_id");
+
+                entity
+                    .HasOne<EquipmentStatus>()
+                    .WithMany(e => e.IssuesWithStatus)
+                    .HasForeignKey(e => e.StatusId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<EquipmentStatus>(entity =>
+            {
+                entity.ToTable("equipment_status");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("id");
+                entity.Property(e => e.Name)
+                    .HasColumnName("name");
+                entity.Property(e => e.Description)
+                    .HasColumnName("description");
+            });
+        }
+    }
+}
