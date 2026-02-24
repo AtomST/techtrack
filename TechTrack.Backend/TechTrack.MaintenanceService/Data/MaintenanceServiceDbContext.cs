@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using TechTrack.MaintenanceService.Data.SharedEntities;
 using TechTrack.MaintenanceService.Issues.Entities;
 using TechTrack.OrganizationService.Equipments.Entities;
 
@@ -14,6 +15,7 @@ namespace TechTrack.MaintenanceService.Data
 
         public DbSet<Issue> Issues { get; set; }
         public DbSet<EquipmentStatus> EquipmentStatuses { get; set; }
+        public DbSet<EquipmentProjection> EquipmentsProjection { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -62,6 +64,18 @@ namespace TechTrack.MaintenanceService.Data
                     .HasColumnName("name");
                 entity.Property(e => e.Description)
                     .HasColumnName("description");
+            });
+
+            modelBuilder.Entity<EquipmentProjection>(entity =>
+            {
+                entity.ToTable("equipments_projection");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("id");
+                entity.Property(e => e.DepartmentId)
+                    .HasColumnName("department_id");
+                entity.Property(e => e.CompanyId)
+                    .HasColumnName("company_id");
             });
         }
     }
