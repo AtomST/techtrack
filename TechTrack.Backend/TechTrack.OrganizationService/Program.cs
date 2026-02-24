@@ -1,8 +1,4 @@
 using MassTransit;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using TechTrack.OrganizationService.Companies.Logic.Implementatios;
 using TechTrack.OrganizationService.Companies.Logic.Interfaces;
 using TechTrack.OrganizationService.Data;
