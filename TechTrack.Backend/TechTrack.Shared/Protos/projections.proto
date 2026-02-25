@@ -5,7 +5,7 @@ option csharp_namespace = "TechTrack.Shared.Protos";
 package projections;
 
 service ProjectionService{
-	rpc GetDepartmentEquipments(GetDepartmentEquipmentsRequest) return GetDepartmentEquipmentsResponse
+	rpc GetDepartmentEquipments(GetDepartmentEquipmentsRequest) returns (GetDepartmentEquipmentsResponse);
 }
 
 message GetDepartmentEquipmentsRequest{
@@ -15,10 +15,11 @@ message GetDepartmentEquipmentsRequest{
 }
 
 message Equipment{
-	string id = 1,
-
+	string id = 1;
 }
 
 message GetDepartmentEquipmentsResponse{
-	
+	repeated Equipment equipments = 1;
+	string company_id = 2;
+	string department_id = 3;
 }

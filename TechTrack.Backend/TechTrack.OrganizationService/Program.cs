@@ -4,6 +4,7 @@ using TechTrack.OrganizationService.Companies.Logic.Interfaces;
 using TechTrack.OrganizationService.Data;
 using TechTrack.OrganizationService.Departments.Logic.Implementations;
 using TechTrack.OrganizationService.Departments.Logic.Interfaces;
+using TechTrack.OrganizationService.Equipments.Logic.gRPC;
 using TechTrack.OrganizationService.Equipments.Logic.Implementations;
 using TechTrack.OrganizationService.Equipments.Logic.Interfaces;
 using TechTrack.Shared.Auth;
@@ -23,9 +24,9 @@ namespace TechTrack.OrganizationService
                 builder.Configuration["Jwt:Issuer"],
                 builder.Configuration["Jwt:AccessTokenKey"]
             ));
+            builder.Services.AddGrpc();
             builder.Services.AddAuthenticationWithoutTokenValidator();
             builder.Services.AddTechTrackAuthorization();
-
             builder.Services.AddTransient<GrpcErrorInterceptor>();
             builder.Services.AddDbContext<OrganizationServiceDbContext>();
             builder.Services.AddMassTransit(x =>
@@ -49,6 +50,8 @@ namespace TechTrack.OrganizationService
             });
 
             var app = builder.Build();
+            app.MapGrpcService<ProjectionGrpcLogic>();
+
             app.UseMiddleware<GlobalExceptionHandler>();
             app.UseMiddleware<JwtAuthenticationMiddleware>();
             app.UseAuthorization();

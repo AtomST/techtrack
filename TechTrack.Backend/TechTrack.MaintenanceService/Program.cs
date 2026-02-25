@@ -1,8 +1,11 @@
 using TechTrack.MaintenanceService.Data;
+using TechTrack.MaintenanceService.Projections.Implementations;
+using TechTrack.MaintenanceService.Projections.Interfaces;
 using TechTrack.Shared.Auth;
 using TechTrack.Shared.Filters;
 using TechTrack.Shared.Logic;
 using TechTrack.Shared.Middleware;
+using TechTrack.Shared.Protos;
 
 namespace TechTrack.MaintenanceService
 {
@@ -18,7 +21,11 @@ namespace TechTrack.MaintenanceService
             ));
             builder.Services.AddAuthenticationWithoutTokenValidator();
             builder.Services.AddTechTrackAuthorization();
-
+            builder.Services.AddTransient<GrpcErrorInterceptor>();
+            builder.Services.AddGrpcClient<ProjectionService.ProjectionServiceClient>(opt =>
+            {
+                opt.Address = new Uri("http://organization-service:8081");
+            }).AddInterceptor<GrpcErrorInterceptor>();
             // Add services to the container.
             builder.Services.AddControllers(opt =>
             {
@@ -26,6 +33,7 @@ namespace TechTrack.MaintenanceService
             });
             builder.Services.AddControllers();
             builder.Services.AddDbContext<MaintenanceServiceDbContext>();
+            builder.Services.AddScoped<IProjectionLogic, ProjectionLogic>();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
