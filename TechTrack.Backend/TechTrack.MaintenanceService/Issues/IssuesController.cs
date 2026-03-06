@@ -21,14 +21,25 @@ namespace TechTrack.MaintenanceService.Issues
         public async Task<IActionResult> CreateIssue([FromBody] CreateIssueRequest request)
         {
 
-            var userInfo = await _issuesLogic.CreateIssueAsync(request, User.GetPrincipalInfo());
+            var response = await _issuesLogic.CreateIssueAsync(request, User.GetPrincipalInfo());
             return Created("",new SuccessResponse
             {
                 StatusCode = System.Net.HttpStatusCode.Created,
                 Data = new
                 {
-                    id = userInfo.IssueId
+                    id = response.IssueId
                 }
+            });
+        }
+        [HttpGet("{equipmentId}")]
+        [Authorize(Policy =Policies.EmployeeAccess)]
+        public async Task<IActionResult> GetIssues(Guid equipmentId)
+        {
+            var response = await _issuesLogic.GetAllIssues(equipmentId, User.GetPrincipalInfo());
+            return Ok(new SuccessResponse
+            {
+                StatusCode =System.Net.HttpStatusCode.OK,
+                Data = response.Issues
             });
         }
     }

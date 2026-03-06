@@ -7,5 +7,6 @@ namespace TechTrack.MaintenanceService.Issues.Logic.Interfaces
     public interface IIssuesLogic
     {
         public Task<CreateIssueResponse> CreateIssueAsync(CreateIssueRequest request, UserPermissionInfo userInfo);
+        public Task<GetAllIssuesResponse> GetAllIssues(Guid equipmentId, UserPermissionInfo userInfo);
     }
 }
