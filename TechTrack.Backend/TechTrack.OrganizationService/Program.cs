@@ -4,6 +4,7 @@ using TechTrack.OrganizationService.Companies.Logic.Interfaces;
 using TechTrack.OrganizationService.Data;
 using TechTrack.OrganizationService.Departments.Logic.Implementations;
 using TechTrack.OrganizationService.Departments.Logic.Interfaces;
+using TechTrack.OrganizationService.Equipments.EventHandlers;
 using TechTrack.OrganizationService.Equipments.Logic.gRPC;
 using TechTrack.OrganizationService.Equipments.Logic.Implementations;
 using TechTrack.OrganizationService.Equipments.Logic.Interfaces;
@@ -31,12 +32,20 @@ namespace TechTrack.OrganizationService
             builder.Services.AddDbContext<OrganizationServiceDbContext>();
             builder.Services.AddMassTransit(x =>
             {
+                x.AddConsumer<IssueRegistredEventHandler>();
+
                 x.UsingRabbitMq((context, cfg) =>
                 {
                     cfg.Host(builder.Configuration["RabbitMQ:Host"], "/", h =>
                     {
                         h.Username(builder.Configuration["RabbitMQ:Username"]);
                         h.Password(builder.Configuration["RabbitMQ:Password"]);
+                    });
+
+                    cfg.ReceiveEndpoint("issue-registred", e =>
+                    {
+                        e.AutoDelete = false;
+                        e.ConfigureConsumer<IssueRegistredEventHandler>(context);
                     });
                 });
             });

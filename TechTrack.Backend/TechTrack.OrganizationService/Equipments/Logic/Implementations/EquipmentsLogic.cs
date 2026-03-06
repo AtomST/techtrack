@@ -6,6 +6,7 @@ using TechTrack.OrganizationService.Equipments.Logic.Interfaces;
 using TechTrack.OrganizationService.Equipments.Models.Requests;
 using TechTrack.OrganizationService.Equipments.Models.Responses;
 using TechTrack.Shared.Auth;
+using TechTrack.Shared.Equipment;
 using TechTrack.Shared.Exceptions;
 
 namespace TechTrack.OrganizationService.Equipments.Logic.Implementations
@@ -20,9 +21,7 @@ namespace TechTrack.OrganizationService.Equipments.Logic.Implementations
         }
         public async Task<AddEquipmentResponse> AddEquipmentAsync(Guid departmentId, AddEquipmentRequest request)
         {
-            var defaultStatus = await _dbContext.EquipmentStatuses
-                .Where(s => s.Name == EquipmentStatusConstants.Green)
-                .FirstOrDefaultAsync();
+            var defaultStatus = (int)EquipmentStatusCode.Green;
 
             var existingNames =
                 await _dbContext.Equipments
@@ -42,7 +41,7 @@ namespace TechTrack.OrganizationService.Equipments.Logic.Implementations
                 SerialNumber = request.SerialNumber,
                 DepartmentId = departmentId,
                 Description = request.Desctiption,
-                EquipmentStatus = defaultStatus
+                CurrentStatusId = defaultStatus
             };
 
             await _dbContext.AddAsync(equipment);
