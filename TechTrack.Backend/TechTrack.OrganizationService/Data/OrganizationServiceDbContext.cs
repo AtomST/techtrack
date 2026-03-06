@@ -15,7 +15,6 @@ namespace TechTrack.OrganizationService.Data
 
         public DbSet<Company> Companies { get; set; }
         public DbSet<CompanyUser> CompanyUser { get; set; }
-        public DbSet<EquipmentStatus> EquipmentStatuses { get; set; }
         public DbSet<Department> Departments { get; set; }
         public DbSet<DepartmentUser> UserDepartments { get; set; }
         public DbSet<Equipment> Equipments { get; set; }
@@ -98,23 +97,6 @@ namespace TechTrack.OrganizationService.Data
                     .HasColumnName("department_id");
                 entity.Property(e => e.CurrentStatusId)
                     .HasColumnName("current_status_id");
-            });
-
-            modelBuilder.Entity<EquipmentStatus>(entity =>
-            {
-                entity.ToTable("equipment_status");
-
-                entity.Property(e => e.Id)
-                    .HasColumnName("id");
-                entity.Property(e => e.Name)
-                    .HasColumnName("name");
-                entity.Property(e => e.Description)
-                    .HasColumnName("description");
-
-                entity
-                    .HasMany<Equipment>()
-                    .WithOne(e => e.EquipmentStatus)
-                    .HasForeignKey(e => e.CurrentStatusId);
             });
 
             modelBuilder.Entity<DepartmentUser>(entity =>
