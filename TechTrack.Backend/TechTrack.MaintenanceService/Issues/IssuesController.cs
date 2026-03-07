@@ -8,7 +8,7 @@ using TechTrack.Shared.Responses;
 namespace TechTrack.MaintenanceService.Issues
 {
     [ApiController]
-    [Route("api/maintenance/[controller]")]
+    [Route("api/equipments/{equipmentId}/issues")]
     public class IssuesController : ControllerBase
     {
         private readonly IIssuesLogic _issuesLogic;
@@ -31,7 +31,7 @@ namespace TechTrack.MaintenanceService.Issues
                 }
             });
         }
-        [HttpGet("{equipmentId}")]
+        [HttpGet]
         [Authorize(Policy =Policies.EmployeeAccess)]
         public async Task<IActionResult> GetIssues(Guid equipmentId)
         {
