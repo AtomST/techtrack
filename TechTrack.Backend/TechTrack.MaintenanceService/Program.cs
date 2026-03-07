@@ -2,6 +2,8 @@ using MassTransit;
 using TechTrack.MaintenanceService.Data;
 using TechTrack.MaintenanceService.Issues.Logic.Implementations;
 using TechTrack.MaintenanceService.Issues.Logic.Interfaces;
+using TechTrack.MaintenanceService.Maintenances.Implementations;
+using TechTrack.MaintenanceService.Maintenances.Interfaces;
 using TechTrack.MaintenanceService.Projections.Implementations;
 using TechTrack.MaintenanceService.Projections.Interfaces;
 using TechTrack.Shared.Auth;
@@ -51,6 +53,7 @@ namespace TechTrack.MaintenanceService
             builder.Services.AddDbContext<MaintenanceServiceDbContext>();
             builder.Services.AddScoped<IProjectionLogic, ProjectionLogic>();
             builder.Services.AddScoped<IIssuesLogic, IssuesLogic>();
+            builder.Services.AddScoped<IMaintenanceLogic, MaintenanceLogic>();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

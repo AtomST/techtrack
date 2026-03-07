@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TechTrack.MaintenanceService.Data.SharedEntities;
 using TechTrack.MaintenanceService.Issues.Entities;
+using TechTrack.MaintenanceService.Maintenances.Entities;
 using TechTrack.OrganizationService.Equipments.Entities;
 
 namespace TechTrack.MaintenanceService.Data
@@ -16,6 +17,8 @@ namespace TechTrack.MaintenanceService.Data
         public DbSet<Issue> Issues { get; set; }
         public DbSet<EquipmentStatus> EquipmentStatuses { get; set; }
         public DbSet<EquipmentProjection> EquipmentsProjection { get; set; }
+
+        public DbSet<Maintenance> MaintenanceLog { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -46,12 +49,23 @@ namespace TechTrack.MaintenanceService.Data
                     .HasColumnType("timestamp with time zone");
                 entity.Property(e => e.EquipmentId)
                     .HasColumnName("equipment_id");
+                entity.Property(e => e.IsResolved)
+                    .HasColumnName("is_resolved");
+                entity.Property(e => e.ResolvedByMaintenanceId)
+                    .HasColumnName("resolved_by_maintenance_id");
 
                 entity
                     .HasOne<EquipmentStatus>()
                     .WithMany(e => e.IssuesWithStatus)
                     .HasForeignKey(e => e.StatusId)
                     .OnDelete(DeleteBehavior.Restrict);
+
+                entity
+                    .HasOne<Maintenance>()
+                    .WithMany(m => m.SolvedIssues)
+                    .HasForeignKey(e => e.ResolvedByMaintenanceId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                    
             });
 
             modelBuilder.Entity<EquipmentStatus>(entity =>
@@ -76,6 +90,18 @@ namespace TechTrack.MaintenanceService.Data
                     .HasColumnName("department_id");
                 entity.Property(e => e.CompanyId)
                     .HasColumnName("company_id");
+            });
+
+            modelBuilder.Entity<Maintenance>(entity =>
+            {
+                entity.ToTable("maintenance_log");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.Name).HasColumnName("name");
+                entity.Property(e => e.Description).HasColumnName("description");
+                entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+                entity.Property(e => e.CreatorId).HasColumnName("creator_id");
+                entity.Property(e => e.EquipmentId).HasColumnName("equipment_id");
             });
         }
     }

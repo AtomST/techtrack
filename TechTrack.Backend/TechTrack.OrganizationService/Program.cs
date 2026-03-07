@@ -33,7 +33,7 @@ namespace TechTrack.OrganizationService
             builder.Services.AddMassTransit(x =>
             {
                 x.AddConsumer<IssueRegistredEventHandler>();
-
+                x.AddConsumer<MaintenanceAddedEventHandler>();
                 x.UsingRabbitMq((context, cfg) =>
                 {
                     cfg.Host(builder.Configuration["RabbitMQ:Host"], "/", h =>
@@ -46,6 +46,12 @@ namespace TechTrack.OrganizationService
                     {
                         e.AutoDelete = false;
                         e.ConfigureConsumer<IssueRegistredEventHandler>(context);
+                    });
+
+                    cfg.ReceiveEndpoint("maintenance-added", e =>
+                    {
+                        e.AutoDelete = false;
+                        e.ConfigureConsumer<MaintenanceAddedEventHandler>(context);
                     });
                 });
             });

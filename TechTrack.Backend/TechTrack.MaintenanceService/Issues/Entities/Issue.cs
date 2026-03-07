@@ -12,7 +12,8 @@ namespace TechTrack.MaintenanceService.Issues.Entities
         public int StatusId { get; set; }
         public DateTime CreatedAt { get; set; }
         public Guid CreatorId { get; set; }
-
+        public bool IsResolved { get; set; } = false;
+        public Guid? ResolvedByMaintenanceId { get; set; }
         public EquipmentStatus? EquipmentStatus { get; set; }
     }
 }
