@@ -40,6 +40,11 @@ namespace TechTrack.MaintenanceService
 
             builder.Services.AddMassTransit(x =>
             {
+                x.AddEntityFrameworkOutbox<MaintenanceServiceDbContext>(c =>
+                {
+                    c.UsePostgres();
+                    c.UseBusOutbox();
+                });
                 x.UsingRabbitMq((context, cfg) =>
                 {
                     cfg.Host(builder.Configuration["RabbitMQ:Host"], "/", h =>

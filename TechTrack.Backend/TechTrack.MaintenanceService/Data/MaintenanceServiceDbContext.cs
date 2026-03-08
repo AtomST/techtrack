@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using MassTransit;
+using Microsoft.EntityFrameworkCore;
 using TechTrack.MaintenanceService.Data.SharedEntities;
 using TechTrack.MaintenanceService.Issues.Entities;
 using TechTrack.MaintenanceService.Maintenances.Entities;
@@ -103,6 +104,10 @@ namespace TechTrack.MaintenanceService.Data
                 entity.Property(e => e.CreatorId).HasColumnName("creator_id");
                 entity.Property(e => e.EquipmentId).HasColumnName("equipment_id");
             });
+
+            modelBuilder.AddInboxStateEntity();
+            modelBuilder.AddOutboxMessageEntity();
+            modelBuilder.AddOutboxStateEntity();
         }
     }
 }

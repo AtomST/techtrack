@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TechTrack.MaintenanceService.Maintenances.Interfaces;
 using TechTrack.MaintenanceService.Maintenances.Models.Requests;
 using TechTrack.Shared.Auth;
+using TechTrack.Shared.Responses;
 
 namespace TechTrack.MaintenanceService.Maintenances
 {
@@ -10,6 +12,7 @@ namespace TechTrack.MaintenanceService.Maintenances
     public class MaintenanceController(IMaintenanceLogic maintenanceLogic) : ControllerBase
     {
         [HttpPost]
+        [Authorize(Policy = Policies.EmployeeAccess)]
         public async Task<IActionResult> AddMaintenance(Guid equipmentId, AddMaintenanceDto requestDto)
         {
             var addMaintenanceRequest = new AddMaintenanceRequest
@@ -21,7 +24,7 @@ namespace TechTrack.MaintenanceService.Maintenances
             );
 
             var response = await maintenanceLogic.AddMaintenance(addMaintenanceRequest, User.GetPrincipalInfo());
-            return Created();
+            return Created("", new SuccessResponse { StatusCode = System.Net.HttpStatusCode.Created});
         }
     }
 }
