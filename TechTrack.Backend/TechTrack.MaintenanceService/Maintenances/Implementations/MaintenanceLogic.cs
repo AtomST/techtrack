@@ -35,9 +35,11 @@ namespace TechTrack.MaintenanceService.Maintenances.Implementations
                 CreatedAt = DateTime.UtcNow,
                 CreatorId = userInfo.UserId
             };
+            await using var tx = await dbContext.Database.BeginTransactionAsync();
 
             await dbContext.MaintenanceLog.AddAsync(maintenance);
             await dbContext.SaveChangesAsync();
+
             var resolvedIssues = ResolveIssues(existingIssues, maintenance.Id);
 
             var maxEquipmentStatusCode = await dbContext.Issues
@@ -55,31 +57,19 @@ namespace TechTrack.MaintenanceService.Maintenances.Implementations
             });
 
             await dbContext.SaveChangesAsync();
+            await tx.CommitAsync();
 
             return new AddMaintenanceResponse();
-
 
         }
 
         private async Task<int> ResolveIssues(IEnumerable<Guid> issuesId, Guid maintenanceId)
         {
-            //Заставить работать ExecuteUpdate с коллекцией
-            logger.LogInformation($"MaintenanceId: {maintenanceId}");
-
-            var idsArray = issuesId.ToArray(); // Guid[]
-            var maintenanceIdParam = new NpgsqlParameter("maintenanceId", maintenanceId);
-            var idsParam = new NpgsqlParameter("ids", NpgsqlDbType.Array | NpgsqlDbType.Uuid)
-            {
-                Value = idsArray
-            };
-
-            return await dbContext.Database.ExecuteSqlRawAsync(@"
-                UPDATE issues 
-                SET 
-                    is_resolved = TRUE,
-                    resolved_by_maintenance_id = @maintenanceId
-                WHERE id = ANY(@ids)",
-                maintenanceIdParam, idsParam);
+            return await dbContext.Issues
+                .Where(i => issuesId.Contains(i.Id))
+                .ExecuteUpdateAsync(s => s
+                    .SetProperty(i => i.IsResolved, true)
+                    .SetProperty(i => i.ResolvedByMaintenanceId, maintenanceId));
         }
 
         private async Task<IEnumerable<Guid>> GetAndValidateExistingIssueIds(IEnumerable<Guid> issuesId, Guid equipmentId)
