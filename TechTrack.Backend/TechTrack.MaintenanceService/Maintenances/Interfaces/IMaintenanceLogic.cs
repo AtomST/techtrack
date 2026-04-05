@@ -7,5 +7,6 @@ namespace TechTrack.MaintenanceService.Maintenances.Interfaces
     public interface IMaintenanceLogic
     {
         public Task<AddMaintenanceResponse> AddMaintenance(AddMaintenanceRequest maintenance, UserPermissionInfo userInfo);
+        public Task<GetMaintenanceLogByEquipmentIdResponse> GetMaintenanceLogByEquipment(Guid equipmentId, UserPermissionInfo userInfo); 
     }
 }

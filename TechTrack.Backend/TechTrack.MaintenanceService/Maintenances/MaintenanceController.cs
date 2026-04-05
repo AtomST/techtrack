@@ -26,5 +26,17 @@ namespace TechTrack.MaintenanceService.Maintenances
             var response = await maintenanceLogic.AddMaintenance(addMaintenanceRequest, User.GetPrincipalInfo());
             return Created("", new SuccessResponse { StatusCode = System.Net.HttpStatusCode.Created});
         }
+
+        [HttpGet]
+        [Authorize(Policy = Policies.EmployeeAccess)]
+        public async Task<IActionResult> GetMaintenanceLog(Guid equipmentId)
+        {
+            var response = await maintenanceLogic.GetMaintenanceLogByEquipment(equipmentId, User.GetPrincipalInfo());
+            return Ok(new SuccessResponse
+            {
+                StatusCode = System.Net.HttpStatusCode.OK,
+                Data = response.MaintenanceLog
+            });
+        }
     }
 }

@@ -83,5 +83,24 @@ namespace TechTrack.MaintenanceService.Maintenances.Implementations
             logger.LogInformation($"{issues.GetType()}");
             return issues;
         }
+
+        public async Task<GetMaintenanceLogByEquipmentIdResponse> GetMaintenanceLogByEquipment(Guid equipmentId, UserPermissionInfo userInfo)
+        {
+            var equipmentProjection = await dbContext.EquipmentsProjection.FirstOrDefaultAsync(e => e.Id == equipmentId)
+                ?? throw new NotFoundException("Оборудование с таким ID не найдено.");
+
+            if (equipmentProjection.CompanyId != Guid.Parse(userInfo.CompanyId))
+                throw new ForbiddenException("Вы должны быть сотрудником компании.");
+
+            var maintenanceLog = await dbContext.MaintenanceLog
+                .AsNoTracking()
+                .Where(m => m.EquipmentId == equipmentId)
+                .ToListAsync();
+
+            return new GetMaintenanceLogByEquipmentIdResponse
+            (
+                maintenanceLog
+            );
+        }
     }
 }
