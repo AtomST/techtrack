@@ -20,12 +20,17 @@ namespace TechTrack.MaintenanceService.Data
         public DbSet<EquipmentProjection> EquipmentsProjection { get; set; }
 
         public DbSet<Maintenance> MaintenanceLog { get; set; }
+        public DbSet<MaintenanceSchedule> MaintenanceSchedule {  get; set; }
+        public DbSet<MaintenanceStatus> MaintenanceStatuses { get; set; }
+        public DbSet<MaintenanceType> MaintenanceTypes { get; set; }
+        public DbSet<ScheduleRecurrenceType> ScheduleRecurrenceTypes { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if(!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseNpgsql(_configuratoin.GetConnectionString("MaintenanceServiceDbConnection"));
+                optionsBuilder.UseNpgsql(_configuratoin.GetConnectionString("MaintenanceServiceDbConnection"))
+                    .UseSnakeCaseNamingConvention();
             }
         }
 
@@ -100,9 +105,19 @@ namespace TechTrack.MaintenanceService.Data
                 entity.Property(e => e.Id).HasColumnName("id");
                 entity.Property(e => e.Name).HasColumnName("name");
                 entity.Property(e => e.Description).HasColumnName("description");
-                entity.Property(e => e.CreatedAt).HasColumnName("created_at");
-                entity.Property(e => e.CreatorId).HasColumnName("creator_id");
+                entity.Property(e => e.ComplitedAt).HasColumnName("complited_at");
+                entity.Property(e => e.ResponsibleUserId).HasColumnName("responsible_user_id");
                 entity.Property(e => e.EquipmentId).HasColumnName("equipment_id");
+                entity.Property(e => e.ScheduleRecordId).HasColumnName("schedule_record_id");
+                entity.Property(e => e.ScheduledDate).HasColumnName("scheduled_date");
+                entity.Property(e => e.MaintenanceTypeId).HasColumnName("maintenance_type_id");
+                entity.Property(e => e.MaintenanceStatusId).HasColumnName("maintenance_status_id");
+            });
+
+            modelBuilder.Entity<MaintenanceSchedule>(entity =>
+            {
+                entity.ToTable("maintenance_schedule");
+
             });
 
             modelBuilder.AddInboxStateEntity();

@@ -9,8 +9,14 @@ namespace TechTrack.MaintenanceService.Maintenances.Entities
         public string? Description { get; set; }
 
         public Guid EquipmentId {  get; set; }
-        public DateTime CreatedAt { get; set; }
-        public Guid CreatorId { get; set; }
+        public Guid? ScheduleRecordId { get; set; }
+        public DateTime? ScheduledDate { get; set; }
+        public DateTime? ComplitedAt { get; set; }
+        public Guid ResponsibleUserId { get; set; }
+        public int MaintenanceTypeId { get; set; }
+        public MaintenanceType? Type { get; set; }
+        public int MaintenanceStatusId { get; set; }
+        public MaintenanceStatus? Status { get; set; }
         public IEnumerable<Issue> SolvedIssues { get; set; } = new List<Issue>();
     }
 }

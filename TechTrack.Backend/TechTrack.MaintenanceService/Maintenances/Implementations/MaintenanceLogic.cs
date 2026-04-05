@@ -32,8 +32,8 @@ namespace TechTrack.MaintenanceService.Maintenances.Implementations
                 Name = request.Name,
                 Description = request.Desctiprion,
                 EquipmentId = request.EquipmentId,
-                CreatedAt = DateTime.UtcNow,
-                CreatorId = userInfo.UserId
+                ComplitedAt = DateTime.UtcNow,
+                ResponsibleUserId = userInfo.UserId
             };
             await using var tx = await dbContext.Database.BeginTransactionAsync();
 
