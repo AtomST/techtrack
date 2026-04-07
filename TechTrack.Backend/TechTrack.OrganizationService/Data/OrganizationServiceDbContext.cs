@@ -16,7 +16,7 @@ namespace TechTrack.OrganizationService.Data
         public DbSet<Company> Companies { get; set; }
         public DbSet<CompanyUser> CompanyUser { get; set; }
         public DbSet<Department> Departments { get; set; }
-        public DbSet<DepartmentUser> UserDepartments { get; set; }
+        public DbSet<DepartmentUser> DepartmentUsers { get; set; }
         public DbSet<Equipment> Equipments { get; set; }
 
 

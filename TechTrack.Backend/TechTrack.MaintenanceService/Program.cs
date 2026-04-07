@@ -6,6 +6,10 @@ using TechTrack.MaintenanceService.Maintenances.Implementations;
 using TechTrack.MaintenanceService.Maintenances.Interfaces;
 using TechTrack.MaintenanceService.Projections.Implementations;
 using TechTrack.MaintenanceService.Projections.Interfaces;
+using TechTrack.MaintenanceService.Schedule.Implementations;
+using TechTrack.MaintenanceService.Schedule.Interfaces;
+using TechTrack.MaintenanceService.Shared.Implementations;
+using TechTrack.MaintenanceService.Shared.Interfaces;
 using TechTrack.Shared.Auth;
 using TechTrack.Shared.Filters;
 using TechTrack.Shared.Logic;
@@ -33,9 +37,19 @@ namespace TechTrack.MaintenanceService
                 opt.Address = new Uri("http://organization-service:8081");
             }).AddInterceptor<GrpcErrorInterceptor>();
 
+            builder.Services.AddGrpcClient<UserDepartmentsService.UserDepartmentsServiceClient>(opt =>
+            {
+                opt.Address = new Uri("http://organization-service:8081");
+            }).AddInterceptor<GrpcErrorInterceptor>();
+
             builder.Services.AddControllers(opt =>
             {
                 opt.Filters.Add<ModelValidationFilter>();
+            });
+
+            builder.Services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = builder.Configuration.GetConnectionString("Redis");
             });
 
             builder.Services.AddMassTransit(x =>
@@ -59,9 +73,12 @@ namespace TechTrack.MaintenanceService
             builder.Services.AddScoped<IProjectionLogic, ProjectionLogic>();
             builder.Services.AddScoped<IIssuesLogic, IssuesLogic>();
             builder.Services.AddScoped<IMaintenanceLogic, MaintenanceLogic>();
+            builder.Services.AddScoped<ICacheLogic, CacheLogic>();
+            builder.Services.AddScoped<IScheduleLogic, ScheduleLogic>();
+            builder.Services.AddScoped<IUserDepartmentLogic, UserDepartmentLogic>();
+
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             app.UseMiddleware<GlobalExceptionHandler>();
             app.UseMiddleware<JwtAuthenticationMiddleware>();
             app.UseAuthorization();
