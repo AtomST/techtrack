@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TechTrack.OrganizationService.Data;
@@ -11,9 +12,11 @@ using TechTrack.OrganizationService.Data;
 namespace TechTrack.OrganizationService.Migrations
 {
     [DbContext(typeof(OrganizationServiceDbContext))]
-    partial class OrganizationServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260407084004_UserHasManyDepartments")]
+    partial class UserHasManyDepartments
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

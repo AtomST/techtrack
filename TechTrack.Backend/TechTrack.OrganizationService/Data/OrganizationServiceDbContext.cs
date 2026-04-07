@@ -103,7 +103,7 @@ namespace TechTrack.OrganizationService.Data
             {
                 entity.ToTable("department_user");
 
-                entity.HasKey(e => e.UserId);
+                entity.HasKey(e => new {e.UserId, e.DepartmentId});
 
                 entity.Property(p => p.UserId)
                     .HasColumnName("user_id")
