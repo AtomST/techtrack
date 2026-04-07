@@ -1,0 +1,17 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "TechTrack.Shared.Protos";
+
+package user_departments;
+
+service UserDepartmentsService {
+  rpc GetUserDepartments (GetUserDepartmentsRequest) returns (GetUserDepartmentsResponse);
+}
+
+message GetUserDepartmentsRequest {
+  string user_id = 1;
+}
+
+message GetUserDepartmentsResponse {
+  repeated string department_ids = 1;
+}
