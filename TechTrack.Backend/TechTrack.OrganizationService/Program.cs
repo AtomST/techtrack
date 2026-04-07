@@ -12,6 +12,7 @@ using TechTrack.Shared.Auth;
 using TechTrack.Shared.Filters;
 using TechTrack.Shared.Logic;
 using TechTrack.Shared.Middleware;
+using TechTrack.Shared.Protos;
 
 namespace TechTrack.OrganizationService
 {
@@ -30,6 +31,10 @@ namespace TechTrack.OrganizationService
             builder.Services.AddTechTrackAuthorization();
             builder.Services.AddTransient<GrpcErrorInterceptor>();
             builder.Services.AddDbContext<OrganizationServiceDbContext>();
+            builder.Services.AddGrpcClient<UserIdService.UserIdServiceClient>(opt =>
+            {
+                opt.Address = new Uri("http://auth-service:8081");
+            }).AddInterceptor<GrpcErrorInterceptor>();
             builder.Services.AddMassTransit(x =>
             {
                 x.AddConsumer<IssueRegistredEventHandler>();

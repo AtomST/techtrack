@@ -1,0 +1,17 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "TechTrack.Shared.Protos";
+
+package user_id;
+
+service UserIdService {
+  rpc GetUserIdByEmail (GetUserIdByEmailRequest) returns (GetUserIdByEmailResponse);
+}
+
+message GetUserIdByEmailRequest {
+  string user_email = 1;
+}
+
+message GetUserIdByEmailResponse {
+  string user_id = 1;
+}

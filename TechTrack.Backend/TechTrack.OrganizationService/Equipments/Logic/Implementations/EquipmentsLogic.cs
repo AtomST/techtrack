@@ -54,7 +54,7 @@ namespace TechTrack.OrganizationService.Equipments.Logic.Implementations
         {
             if(userPermissionInfo.Role == Roles.Employee || userPermissionInfo.Role == null)
             {
-                var isDepartmentEmployee = await _dbContext.UserDepartments
+                var isDepartmentEmployee = await _dbContext.DepartmentUsers
                     .Where(ud => ud.DepartmentId == departmentId && ud.UserId == userPermissionInfo.UserId)
                     .AnyAsync();
 

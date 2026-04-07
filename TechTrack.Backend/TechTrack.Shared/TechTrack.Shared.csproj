@@ -27,5 +27,6 @@
 	<Protobuf Include="Protos/company_user.proto" GrpcServices="Both" />
 	<ProtoBuf Include="Protos/projections.proto" GrpcService="Both" />
 	<ProtoBuf Include="Protos/user_departments.proto" GrpcService="Both" />
+	<ProtoBuf Include="Protos/user_id.proto" GrpcService="Both" />
   </ItemGroup>
 </Project>

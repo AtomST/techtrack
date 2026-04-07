@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication;
 using TechTrack.AuthService.Configuration;
 using TechTrack.AuthService.Data;
 using TechTrack.AuthService.Logic.EventHandlers;
+using TechTrack.AuthService.Logic.gRPC;
 using TechTrack.AuthService.Logic.Implementations;
 using TechTrack.AuthService.Logic.Interfaces;
 using TechTrack.Shared.Logic;
@@ -69,6 +70,7 @@ namespace TechTrack.AuthService
 
             var app = builder.Build();
             app.MapGrpcService<UserRoleChangedHandler>();
+            app.MapGrpcService<UserIdGrpcLogic>();
             app.UseMiddleware<GlobalExceptionHandler>();
 
             app.MapControllers();
