@@ -10,7 +10,7 @@ using TechTrack.Shared.Responses;
 namespace TechTrack.OrganizationService.Departments
 {
     [ApiController]
-    [Route("api/companies/{companyId}/[controller]")]
+    [Route("api/[controller]")]
     public class DepartmentsController : ControllerBase
     {
         private readonly IDepartmentsLogic _departmentsLogic;
@@ -22,21 +22,17 @@ namespace TechTrack.OrganizationService.Departments
 
         [HttpPost]
         [Authorize(Policy = Policies.CompanyHeadAccess)]
-        public async Task<IActionResult> CreateDepartment(Guid companyId, CreateDepartmentRequest request)
+        public async Task<IActionResult> CreateDepartment(CreateDepartmentRequest request)
         {
-            User.AdditionalPolicyValidation(companyId);
-
-            var response = await _departmentsLogic.CreateDepartmentAsync(companyId, request);
+            var response = await _departmentsLogic.CreateDepartmentAsync(request, User.GetPrincipalInfo());
             return Created();
         }
 
         [HttpGet]
         [Authorize(Policy = Policies.CompanyHeadAccess)]
-        public async Task<IActionResult> GetAllDepartments(Guid companyId)
+        public async Task<IActionResult> GetAllDepartments()
         {
-            User.AdditionalPolicyValidation(companyId);
-
-            var response = await _departmentsLogic.GetAllDepartmentsAsync(companyId);
+            var response = await _departmentsLogic.GetAllDepartmentsAsync(User.GetPrincipalInfo());
             return Ok(new SuccessResponse
             {
                 StatusCode = System.Net.HttpStatusCode.OK,
@@ -46,10 +42,8 @@ namespace TechTrack.OrganizationService.Departments
 
         [HttpGet("{departmentId}")]
         [Authorize(Policy = Policies.EmployeeAccess)]
-        public async Task<IActionResult> GetFullDepartmentInfoById(Guid companyId,Guid departmentId)
+        public async Task<IActionResult> GetFullDepartmentInfoById(Guid departmentId)
         {
-            User.AdditionalPolicyValidation(companyId);
-
             var response = await _departmentsLogic.GetFullDepartmentInfoAsync(
                 departmentId,
                 User.GetPrincipalInfo()
@@ -61,7 +55,12 @@ namespace TechTrack.OrganizationService.Departments
                 Data = response.Department
             });
         }
-
+        //[HttpPost("{departmentId}/employees")]
+        //[Authorize(Policy = Policies.ManagementAccess)]]
+        //public async Task<IActionResult> AddEmployeeById(Guid departmentId)
+        //{
+            
+        //}
 
     }
 }

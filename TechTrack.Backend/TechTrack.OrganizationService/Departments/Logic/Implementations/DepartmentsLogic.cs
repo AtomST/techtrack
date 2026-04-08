@@ -24,9 +24,9 @@ namespace TechTrack.OrganizationService.Departments.Logic.Implementations
             _logger= logger;
         }
 
-        public async Task<CreateDepartmentResponse> CreateDepartmentAsync(Guid companyId, CreateDepartmentRequest request)
+        public async Task<CreateDepartmentResponse> CreateDepartmentAsync(CreateDepartmentRequest request, UserPermissionInfo userInfo)
         {
-            var company = await _dbContext.Companies.FindAsync(companyId)
+            var company = await _dbContext.Companies.FindAsync(userInfo.CompanyId)
                 ?? throw new NotFoundException("Компания с таким Id не найдена.");
 
             var department = new Department()
@@ -36,7 +36,7 @@ namespace TechTrack.OrganizationService.Departments.Logic.Implementations
                 ResponsibleUserId = request.ResponsibleUserId,
             };
 
-            var isUserInCompany = await _dbContext.CompanyUser.AnyAsync(cu => cu.UserId == request.ResponsibleUserId && cu.CompanyId == companyId);
+            var isUserInCompany = await _dbContext.CompanyUser.AnyAsync(cu => cu.UserId == request.ResponsibleUserId && cu.CompanyId == userInfo.CompanyId);
             if (request.ResponsibleUserId.HasValue && !isUserInCompany
                 )
             {
@@ -56,9 +56,12 @@ namespace TechTrack.OrganizationService.Departments.Logic.Implementations
             return new CreateDepartmentResponse(department.Id);
         }
 
-        public async Task<GetAllDepartmentsResponse> GetAllDepartmentsAsync(Guid companyId)
+        public async Task<GetAllDepartmentsResponse> GetAllDepartmentsAsync(UserPermissionInfo userInfo)
         {
-            var departments = await _dbContext.Departments.AsNoTracking().Where(d => d.CompanyId == companyId).ToListAsync();
+            var departments = await _dbContext.Departments
+                .AsNoTracking()
+                .Where(d => d.CompanyId == userInfo.CompanyId)
+                .ToListAsync();
 
             return new GetAllDepartmentsResponse
             {
@@ -75,6 +78,9 @@ namespace TechTrack.OrganizationService.Departments.Logic.Implementations
                 .Where(d => d.Id == departmentId)
                 .FirstOrDefaultAsync()
                     ?? throw new NotFoundException("Отдел не найден.");
+
+            if (department.CompanyId != permissionInfo.CompanyId)
+                throw new ForbiddenException("Вы можете иметь доступ только к отделам своей компании");
 
             if (permissionInfo.Role == Roles.Employee || permissionInfo.Role == Roles.Manager)
             {

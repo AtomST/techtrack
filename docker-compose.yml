@@ -79,6 +79,7 @@ services:
     depends_on:
       - postgres-organization
       - rabbitmq
+      - api-gateway
 
   auth-service:
     build:
@@ -93,6 +94,7 @@ services:
     depends_on:
       - postgres-auth
       - rabbitmq
+      - api-gateway
 
   user-service:
     build:
@@ -108,6 +110,7 @@ services:
     depends_on:
       - postgres-user
       - rabbitmq
+      - api-gateway
 
   maintenance-service:
     build:
@@ -118,11 +121,13 @@ services:
       - "8081"
     environment:
       - ConnectionStrings__MaintenanceServiceDbConnection=Host=postgres-maintenance;Database=maintenance_service;Username=postgres;Password=admin
+      - ConnectionStrings__Redis=redis-maintenance:6379
       - Jwt__Issuer=http://auth-service:8080
       - Jwt__AccessTokenKey=5c6dd372771c07a19980ce9ad6f251f3ea8f9974a85a943152a68906a2708f7d
     depends_on:
       - postgres-maintenance
       - rabbitmq
+      - api-gateway
 
   frontend:
     build:
@@ -132,6 +137,11 @@ services:
       - '3000:3000'
     volumes:
       - frontend_data:/var/lib/frontend/data
+    
+  redis-maintenance:
+    image: redis:7
+    ports:
+    - "6379:6379"
 
 volumes:
   frontend_data:
