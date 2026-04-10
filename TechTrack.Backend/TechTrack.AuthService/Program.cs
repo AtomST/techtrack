@@ -51,7 +51,7 @@ namespace TechTrack.AuthService
                         e.ConfigureConsumer<UserRoleChangedHandler>(context);
                     });
 
-                    cfg.ReceiveEndpoint("company-changed", e =>
+                    cfg.ReceiveEndpoint("company-changed", e => 
                     {
                         e.AutoDelete = false;
                         e.ConfigureConsumer<UserCompanyChangedHandler>(context);
@@ -69,8 +69,6 @@ namespace TechTrack.AuthService
             builder.Services.Configure<SecurityOptions>(builder.Configuration.GetSection("Security"));
 
             var app = builder.Build();
-            app.MapGrpcService<UserRoleChangedHandler>();
-            app.MapGrpcService<UserIdGrpcLogic>();
             app.UseMiddleware<GlobalExceptionHandler>();
 
             app.MapControllers();
