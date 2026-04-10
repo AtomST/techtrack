@@ -22,6 +22,7 @@ namespace TechTrack.UserService.Logic.EventHandlers
             User user = new User()
             {
                 Id = message.Id,
+                Email = message.Email,
                 CreatedAt = message.CreatedAt,
                 FullName = message.Name,
                 PhoneNumber = message.PhoneNumber,

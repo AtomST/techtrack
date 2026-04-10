@@ -56,10 +56,10 @@ namespace TechTrack.OrganizationService.Departments
             });
         }
         //[HttpPost("{departmentId}/employees")]
-        //[Authorize(Policy = Policies.ManagementAccess)]]
-        //public async Task<IActionResult> AddEmployeeById(Guid departmentId)
+        //[Authorize(Policy = Policies.ManagementAccess)]
+        //public async Task<IActionResult> AddEmployeeById(Guid departmentId, )
         //{
-            
+        //    var response 
         //}
 
     }

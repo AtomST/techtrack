@@ -34,15 +34,23 @@ namespace TechTrack.OrganizationService.Companies.Logic.Implementatios
             if (string.IsNullOrEmpty(userId))
                 throw new NotFoundException("Пользователь с таким Email не найден.");
 
+            var guidUserId = Guid.Parse(userId);
+
             var company = await _dbContext.Companies.FirstOrDefaultAsync(c => c.Id == companyId)
                 ?? throw new NotFoundException("Компания с таким Id не найдена.");
 
             company.UsersInfo.Add(new CompanyUser
             {
-                UserId = Guid.Parse(userId),
+                UserId = guidUserId,
                 JoinedAt = DateTime.UtcNow
             });
             await _dbContext.SaveChangesAsync();
+            await _publishEndpoint.Publish(new UserCompanyChanged
+            {
+                UserId = guidUserId,
+                CompanyId = companyId
+            });
+            await _publishEndpoint.Publish(new UserRoleChanged())
             return;
 
         }

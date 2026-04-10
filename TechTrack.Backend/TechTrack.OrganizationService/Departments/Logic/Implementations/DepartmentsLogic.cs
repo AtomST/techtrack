@@ -24,6 +24,19 @@ namespace TechTrack.OrganizationService.Departments.Logic.Implementations
             _logger= logger;
         }
 
+        public async Task AddEmployeeByIdAsync(Guid departmentId, UserPermissionInfo permissionInfo, AddEmployeeByIdRequest request)
+        {
+            var department = await _dbContext.Departments
+                .Where(d => d.Id == departmentId)
+                .FirstOrDefaultAsync()
+                ?? throw new NotFoundException("Отдел с таким Id не найден.");
+
+            if (department.CompanyId != permissionInfo.CompanyId)
+                throw new ForbiddenException("Вы можете иметь доступ только к отделам своей компании");
+
+
+        }
+
         public async Task<CreateDepartmentResponse> CreateDepartmentAsync(CreateDepartmentRequest request, UserPermissionInfo userInfo)
         {
             var company = await _dbContext.Companies.FindAsync(userInfo.CompanyId)

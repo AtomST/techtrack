@@ -11,5 +11,6 @@ namespace TechTrack.OrganizationService.Departments.Logic.Interfaces
         public Task<GetAllDepartmentsResponse> GetAllDepartmentsAsync(UserPermissionInfo userInfo);
 
         public Task<GetFullDepartmentInfoResponse> GetFullDepartmentInfoAsync(Guid departmentId, UserPermissionInfo permissionInfo);
+        public Task AddEmployeeByIdAsync(Guid departmentId, UserPermissionInfo permissionInfo, AddEmployeeByIdRequest request);
     }
 }

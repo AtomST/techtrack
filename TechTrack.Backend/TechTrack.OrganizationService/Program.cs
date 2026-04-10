@@ -33,7 +33,7 @@ namespace TechTrack.OrganizationService
             builder.Services.AddDbContext<OrganizationServiceDbContext>();
             builder.Services.AddGrpcClient<UserIdService.UserIdServiceClient>(opt =>
             {
-                opt.Address = new Uri("http://auth-service:8081");
+                opt.Address = new Uri("http://user-service:8081");
             }).AddInterceptor<GrpcErrorInterceptor>();
             builder.Services.AddMassTransit(x =>
             {

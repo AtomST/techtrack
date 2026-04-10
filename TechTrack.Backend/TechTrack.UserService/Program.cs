@@ -45,7 +45,7 @@ namespace TechTrack.UserService
                 x.AddConsumer<UserCreatedEventHandler>();
                 x.AddConsumer<CompanyRegisteredWithOwnerHandler>();
                 x.AddConsumer<DepartmentCreatedWithHeadHandler>();
-
+                x.AddConsumer<UserCompanyChangedHandler>();
                 x.UsingRabbitMq((context, cfg) =>
                 {
                     cfg.Host(builder.Configuration["RabbitMQ:Host"], "/", h =>
@@ -53,22 +53,28 @@ namespace TechTrack.UserService
                         h.Username(builder.Configuration["RabbitMQ:Username"]);
                         h.Password(builder.Configuration["RabbitMQ:Password"]);
                     });
-
+                    cfg.ReceiveEndpoint("users.company-changed", e =>
+                    {
+                        e.ConfigureConsumer<UserCompanyChangedHandler>(context);
+                    });
                     cfg.ReceiveEndpoint("user-created", e =>
                     {
                         e.AutoDelete = false;
+                        e.Durable = true;
                         e.ConfigureConsumer<UserCreatedEventHandler>(context);
                     });
 
                     cfg.ReceiveEndpoint("users.company-registered-withowner", e =>
                     {
                         e.AutoDelete = false;
+                        e.Durable = true;
                         e.ConfigureConsumer<CompanyRegisteredWithOwnerHandler>(context);
                     });
 
                     cfg.ReceiveEndpoint("users.department-created-withhead", e =>
                     {
                         e.AutoDelete = false;
+                        e.Durable = true;
                         e.ConfigureConsumer<DepartmentCreatedWithHeadHandler>(context);
                     });
                 });
@@ -82,9 +88,8 @@ namespace TechTrack.UserService
             var app = builder.Build();
             app.UseMiddleware<GlobalExceptionHandler>();
             app.UseMiddleware<JwtAuthenticationMiddleware>();
-
             app.MapGrpcService<RolesGrpcLogic>();
-
+            app.MapGrpcService<UserIdGrpcLogic>();
             app.UseAuthentication();
             app.UseAuthorization();
 

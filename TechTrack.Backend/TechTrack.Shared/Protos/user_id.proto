@@ -6,6 +6,7 @@ package user_id;
 
 service UserIdService {
   rpc GetUserIdByEmail (GetUserIdByEmailRequest) returns (GetUserIdByEmailResponse);
+  rpc IsUserExists(IsUserExistsRequest) returns (IsUserExistsResponse);
 }
 
 message GetUserIdByEmailRequest {
@@ -14,4 +15,12 @@ message GetUserIdByEmailRequest {
 
 message GetUserIdByEmailResponse {
   string user_id = 1;
+}
+
+message IsUserExistsRequest {
+	string user_id = 1;
+}
+
+message IsUserExistsResponse{
+	bool is_user_exists = 1; 
 }
