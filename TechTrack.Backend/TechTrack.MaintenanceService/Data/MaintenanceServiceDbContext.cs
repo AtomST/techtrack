@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using TechTrack.MaintenanceService.Data.SharedEntities;
 using TechTrack.MaintenanceService.Issues.Entities;
 using TechTrack.MaintenanceService.Maintenances.Entities;
+using TechTrack.MaintenanceService.Schedule.Entities;
 using TechTrack.OrganizationService.Equipments.Entities;
 
 namespace TechTrack.MaintenanceService.Data
@@ -108,7 +109,6 @@ namespace TechTrack.MaintenanceService.Data
                 entity.Property(e => e.ComplitedAt).HasColumnName("complited_at");
                 entity.Property(e => e.ResponsibleUserId).HasColumnName("responsible_user_id");
                 entity.Property(e => e.EquipmentId).HasColumnName("equipment_id");
-                entity.Property(e => e.ScheduleRecordId).HasColumnName("schedule_record_id");
                 entity.Property(e => e.ScheduledDate).HasColumnName("scheduled_date");
                 entity.Property(e => e.MaintenanceTypeId).HasColumnName("maintenance_type_id");
                 entity.Property(e => e.MaintenanceStatusId).HasColumnName("maintenance_status_id");

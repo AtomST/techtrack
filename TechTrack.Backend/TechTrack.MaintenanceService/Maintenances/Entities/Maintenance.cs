@@ -1,4 +1,5 @@
 ﻿using TechTrack.MaintenanceService.Issues.Entities;
+using TechTrack.MaintenanceService.Schedule.Entities;
 
 namespace TechTrack.MaintenanceService.Maintenances.Entities
 {
@@ -9,7 +10,8 @@ namespace TechTrack.MaintenanceService.Maintenances.Entities
         public string? Description { get; set; }
 
         public Guid EquipmentId {  get; set; }
-        public Guid? ScheduleRecordId { get; set; }
+        public Guid? MaintenanceScheduleRecordId { get; set; }
+        public MaintenanceSchedule? MaintenanceScheduleRecord { get; set; }
         public DateTime? ScheduledDate { get; set; }
         public DateTime? ComplitedAt { get; set; }
         public Guid ResponsibleUserId { get; set; }

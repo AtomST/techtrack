@@ -1,5 +1,6 @@
 using MassTransit;
 using TechTrack.MaintenanceService.Data;
+using TechTrack.MaintenanceService.Data.EntitySeeders;
 using TechTrack.MaintenanceService.Issues.Logic.Implementations;
 using TechTrack.MaintenanceService.Issues.Logic.Interfaces;
 using TechTrack.MaintenanceService.Maintenances.Implementations;
@@ -11,6 +12,7 @@ using TechTrack.MaintenanceService.Schedule.Interfaces;
 using TechTrack.MaintenanceService.Shared.Implementations;
 using TechTrack.MaintenanceService.Shared.Interfaces;
 using TechTrack.Shared.Auth;
+using TechTrack.Shared.Database;
 using TechTrack.Shared.Filters;
 using TechTrack.Shared.Logic;
 using TechTrack.Shared.Middleware;
@@ -20,7 +22,7 @@ namespace TechTrack.MaintenanceService
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddSingleton(new JwtTokenValidator
@@ -75,7 +77,15 @@ namespace TechTrack.MaintenanceService
             builder.Services.AddScoped<IMaintenanceLogic, MaintenanceLogic>();
             builder.Services.AddScoped<ICacheLogic, CacheLogic>();
             builder.Services.AddScoped<IScheduleLogic, ScheduleLogic>();
+            builder.Services.AddScoped<IUserDepartmentCacheHelper, UserDepartmentCacheHelper>();
             builder.Services.AddScoped<IUserDepartmentLogic, UserDepartmentLogic>();
+
+            builder.Services.AddScoped(typeof(SharedDbSeeder<>));
+            builder.Services.AddScoped<IEntitySeeder, MaintenanceStatusSeeder>();
+            builder.Services.AddScoped<IEntitySeeder, MaintenanceTypeSeeder>();
+            builder.Services.AddScoped<IEntitySeeder, ScheduleRecurrenceTypeSeeder>();
+
+            builder.Services.AddScoped<MaintenanceServiceDbSeeder>();
 
             var app = builder.Build();
 
@@ -85,8 +95,14 @@ namespace TechTrack.MaintenanceService
 
 
             app.MapControllers();
-
+            using (var scope = app.Services.CreateScope())
+            {
+                var seeder = scope.ServiceProvider.GetRequiredService<MaintenanceServiceDbSeeder>();
+                await seeder.SeedAsync();
+            }
             app.Run();
+
+
         }
     }
 }
