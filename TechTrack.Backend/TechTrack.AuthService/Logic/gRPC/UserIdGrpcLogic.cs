@@ -23,5 +23,26 @@ namespace TechTrack.AuthService.Logic.gRPC
                 UserId = userCredentials.Id.ToString()
             };
         }
+
+        public override async Task<IsUserExistsResponse> IsUserExists(IsUserExistsRequest request, ServerCallContext context)
+        {
+            if (Guid.TryParse(request.UserId, out var guidUserId))
+                throw new RpcException(
+                    new Status(
+                        StatusCode.InvalidArgument,
+                        "Неверный формат UserId"
+                    )
+                );
+
+            var isExists = await _dbContext.UserCredentials
+                .Where(u => u.Id == guidUserId)
+                .AnyAsync();
+
+            return new IsUserExistsResponse
+            {
+                IsUserExists = isExists
+            };
+        }
     }
+
 }

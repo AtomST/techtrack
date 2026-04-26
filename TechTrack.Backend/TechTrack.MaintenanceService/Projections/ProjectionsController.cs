@@ -17,7 +17,7 @@ namespace TechTrack.MaintenanceService.Projections
         }
 
         [HttpPost("{departmentId:guid}")]
-        [Authorize(Policy = Policies.SupervisorAccess)]
+        [Authorize(Policy = Policies.ManagementAccess)]
         public async Task<IActionResult> ProjectionSync(Guid departmentId)
         {
             var result = await _projectionLogic.ProjectionSync(departmentId, User.GetPrincipalInfo());

@@ -1,15 +1,17 @@
-﻿using TechTrack.MaintenanceService.Shared.Interfaces;
+﻿using MassTransit;
+using TechTrack.MaintenanceService.Shared.Interfaces;
 using TechTrack.Shared.Protos;
 
 namespace TechTrack.MaintenanceService.Shared.Implementations
 {
     public class UserDepartmentLogic(
         ICacheLogic _cache, 
-        UserDepartmentsService.UserDepartmentsServiceClient _grpcClient) : IUserDepartmentLogic
+        UserDepartmentsService.UserDepartmentsServiceClient _grpcClient,
+        IUserDepartmentCacheHelper _cacheHelper) : IUserDepartmentLogic
     {
         public async Task<List<Guid>> GetUserDepartmentIds(Guid userId)
         {
-            var cacheKey = $"user:{userId}:departments";
+            var cacheKey = _cacheHelper.GetUserDepartmentCacheKey(userId);
 
             var cached = await _cache.GetAsync<List<Guid>>(cacheKey);
 
@@ -25,9 +27,10 @@ namespace TechTrack.MaintenanceService.Shared.Implementations
                 .Select(Guid.Parse)
                 .ToList();
 
-            await _cache.SetAsync(cacheKey, departments, TimeSpan.FromDays(7));
+            await _cache.SetAsync(cacheKey, departments, _cacheHelper.GetUserDepartmentCacheTTL());
 
             return departments;
         }
     }
+
 }

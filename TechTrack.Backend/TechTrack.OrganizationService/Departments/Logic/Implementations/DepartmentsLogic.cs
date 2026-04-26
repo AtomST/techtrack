@@ -8,6 +8,7 @@ using TechTrack.OrganizationService.Departments.Models.Responses;
 using TechTrack.Shared.Auth;
 using TechTrack.Shared.Events;
 using TechTrack.Shared.Exceptions;
+using TechTrack.Shared.Protos;
 
 namespace TechTrack.OrganizationService.Departments.Logic.Implementations
 {
@@ -16,12 +17,14 @@ namespace TechTrack.OrganizationService.Departments.Logic.Implementations
         private readonly OrganizationServiceDbContext _dbContext;
         private readonly IPublishEndpoint _publishEndpoint;
         private readonly ILogger<DepartmentsLogic> _logger;
+        private readonly UserIdService.UserIdServiceClient _userGrpcClient;
 
-        public DepartmentsLogic(OrganizationServiceDbContext dbContext, IPublishEndpoint publishEndpoint, ILogger<DepartmentsLogic> logger)
+        public DepartmentsLogic(OrganizationServiceDbContext dbContext, IPublishEndpoint publishEndpoint, ILogger<DepartmentsLogic> logger, UserIdService.UserIdServiceClient userGrpcClient)
         {
             _dbContext = dbContext;
             _publishEndpoint = publishEndpoint;
             _logger= logger;
+            _userGrpcClient= userGrpcClient;
         }
 
         public async Task AddEmployeeByIdAsync(Guid departmentId, UserPermissionInfo permissionInfo, AddEmployeeByIdRequest request)
@@ -34,7 +37,21 @@ namespace TechTrack.OrganizationService.Departments.Logic.Implementations
             if (department.CompanyId != permissionInfo.CompanyId)
                 throw new ForbiddenException("Вы можете иметь доступ только к отделам своей компании");
 
+            var isUserExistsResponse = await _userGrpcClient.IsUserExistsAsync(new IsUserExistsRequest
+            {
+                UserId = request.Id.ToString()
+            });
 
+            if(!isUserExistsResponse.IsUserExists)
+                throw new NotFoundException("Пользователь с таким ID не найден.");
+
+            department.DepartmentEmployees.Add(new DepartmentUser
+            {
+                UserId = request.Id,
+                JoinedAt = DateTime.UtcNow,
+            });
+
+            await _dbContext.SaveChangesAsync();
         }
 
         public async Task<CreateDepartmentResponse> CreateDepartmentAsync(CreateDepartmentRequest request, UserPermissionInfo userInfo)

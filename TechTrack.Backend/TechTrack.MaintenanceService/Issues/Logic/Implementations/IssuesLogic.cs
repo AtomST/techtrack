@@ -24,7 +24,7 @@ namespace TechTrack.MaintenanceService.Issues.Logic.Implementations
         }
         public async Task<CreateIssueResponse> CreateIssueAsync(CreateIssueRequest request, UserPermissionInfo userInfo)
         {
-            var equipmentProjection = await GetEquipmentProjectionWithCompanyCheck(request.EquipmentId, Guid.Parse(userInfo.CompanyId));
+            var equipmentProjection = await GetEquipmentProjectionWithCompanyCheck(request.EquipmentId, userInfo.CompanyId);
 
             var equipmentStatus = await _dbContext.EquipmentStatuses.FirstOrDefaultAsync(s => s.Id == request.StatusId)
                 ?? throw new NotFoundException("Статус с таким ID не найден.");
@@ -55,7 +55,9 @@ namespace TechTrack.MaintenanceService.Issues.Logic.Implementations
 
         public async Task<GetAllIssuesResponse> GetAllIssues(Guid equipmentId, UserPermissionInfo permissionInfo)
         {
-            await GetEquipmentProjectionWithCompanyCheck(equipmentId, Guid.Parse(permissionInfo.CompanyId));
+            if (permissionInfo.CompanyId == null)
+                throw new ForbiddenException("Вы не имеет доступ к данным этой компании");
+            await GetEquipmentProjectionWithCompanyCheck(equipmentId, permissionInfo.CompanyId);
 
             var issues = await _dbContext.Issues
                 .AsNoTracking()
@@ -68,7 +70,7 @@ namespace TechTrack.MaintenanceService.Issues.Logic.Implementations
             };
         }
         
-        private async Task<EquipmentProjection> GetEquipmentProjectionWithCompanyCheck(Guid equipmentId, Guid companyId)
+        private async Task<EquipmentProjection> GetEquipmentProjectionWithCompanyCheck(Guid equipmentId, Guid? companyId)
         {
             var equipmentProjection = await _dbContext.EquipmentsProjection.FirstOrDefaultAsync(e => e.Id == equipmentId)
                 ?? throw new NotFoundException("Оборудование с таким ID не найдено.");

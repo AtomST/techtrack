@@ -22,7 +22,7 @@ namespace TechTrack.MaintenanceService.Maintenances.Implementations
             var equipmentProjection = await dbContext.EquipmentsProjection.FirstOrDefaultAsync(e => e.Id == request.EquipmentId)
                 ?? throw new NotFoundException("Оборудование с таким ID не найдено.");
 
-            if (equipmentProjection.CompanyId != Guid.Parse(userInfo.CompanyId))
+            if (equipmentProjection.CompanyId != userInfo.CompanyId)
                 throw new ForbiddenException("Вы должны быть сотрудником компании.");
 
             var existingIssues = await GetAndValidateExistingIssueIds(request.SolvedIssuesId, request.EquipmentId);
@@ -89,7 +89,7 @@ namespace TechTrack.MaintenanceService.Maintenances.Implementations
             var equipmentProjection = await dbContext.EquipmentsProjection.FirstOrDefaultAsync(e => e.Id == equipmentId)
                 ?? throw new NotFoundException("Оборудование с таким ID не найдено.");
 
-            if (equipmentProjection.CompanyId != Guid.Parse(userInfo.CompanyId))
+            if (equipmentProjection.CompanyId != userInfo.CompanyId)
                 throw new ForbiddenException("Вы должны быть сотрудником компании.");
 
             var maintenanceLog = await dbContext.MaintenanceLog

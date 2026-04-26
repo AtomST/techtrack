@@ -38,5 +38,9 @@ namespace TechTrack.MaintenanceService.Maintenances
                 Data = response.MaintenanceLog
             });
         }
+        [HttpPost]
+        [Route("api/maintenance/{maintenanceId:guid}/complete")]
+        [Authorize(Policy = Policies.EmployeeAccess)]
+        public async Task<IActionResult> CompleteMaintenance()
     }
 }

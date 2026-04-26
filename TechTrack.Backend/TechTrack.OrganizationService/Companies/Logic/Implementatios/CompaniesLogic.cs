@@ -50,7 +50,7 @@ namespace TechTrack.OrganizationService.Companies.Logic.Implementatios
                 UserId = guidUserId,
                 CompanyId = companyId
             });
-            await _publishEndpoint.Publish(new UserRoleChanged())
+            await _publishEndpoint.Publish(new UserRoleChanged());
             return;
 
         }

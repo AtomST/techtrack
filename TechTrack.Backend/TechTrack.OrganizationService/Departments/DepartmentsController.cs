@@ -55,12 +55,17 @@ namespace TechTrack.OrganizationService.Departments
                 Data = response.Department
             });
         }
-        //[HttpPost("{departmentId}/employees")]
-        //[Authorize(Policy = Policies.ManagementAccess)]
-        //public async Task<IActionResult> AddEmployeeById(Guid departmentId, )
-        //{
-        //    var response 
-        //}
+        [HttpPost("{departmentId}/employees")]
+        [Authorize(Policy = Policies.ManagementAccess)]
+        public async Task<IActionResult> AddEmployeeById(Guid departmentId, AddEmployeeByIdRequest request)
+        {
+            await _departmentsLogic.AddEmployeeByIdAsync(departmentId, User.GetPrincipalInfo(),request);
+
+            return Ok(new SuccessResponse
+            {
+                StatusCode = System.Net.HttpStatusCode.OK
+            });
+        }
 
     }
 }

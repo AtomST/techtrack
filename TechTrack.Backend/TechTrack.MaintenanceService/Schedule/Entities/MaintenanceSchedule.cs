@@ -6,7 +6,7 @@ namespace TechTrack.MaintenanceService.Schedule.Entities
     {
         public Guid Id {  get; set; }
         public Guid EquipmentId { get; set; }
-
+        public string MaintenanceName { get; set; }
         public int RecurrenceTypeId { get; set; }
         public ScheduleRecurrenceType? RecurrenceType { get; set; }
         public int IntervalValue { get; set; }
