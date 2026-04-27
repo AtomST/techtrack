@@ -7,12 +7,13 @@ using TechTrack.MaintenanceService.Schedule.Entities;
 using TechTrack.MaintenanceService.Schedule.Interfaces;
 using TechTrack.MaintenanceService.Schedule.Models.Requests;
 using TechTrack.MaintenanceService.Schedule.Models.Responses;
+using TechTrack.MaintenanceService.Shared.Implementations;
 using TechTrack.Shared.Auth;
 using TechTrack.Shared.Exceptions;
 
 namespace TechTrack.MaintenanceService.Schedule.Implementations
 {
-    public class ScheduleLogic(MaintenanceServiceDbContext dbContext) : IScheduleLogic
+    public class ScheduleLogic(MaintenanceServiceDbContext dbContext, UserDepartmentLogic userDepartmentLogic) : IScheduleLogic
     {
         public async Task<AddScheduleRecordResponse> AddScheduleRecord(AddScheduleRecordRequest request, UserPermissionInfo userInfo)
         {
@@ -21,6 +22,12 @@ namespace TechTrack.MaintenanceService.Schedule.Implementations
 
             if (equipmentProjection.CompanyId != userInfo.CompanyId)
                 throw new ForbiddenException("Вы должны быть сотрудником компании.");
+
+            var userDepartments = await userDepartmentLogic.GetUserDepartmentIds(userInfo.UserId);
+            if(!userDepartments.Contains(equipmentProjection.DepartmentId))
+            {
+                throw new ForbiddenException("У вас нет доступа к планированию ТО для техники этого отдела.");
+            }
 
             var scheduleRecord = new MaintenanceSchedule
             {
