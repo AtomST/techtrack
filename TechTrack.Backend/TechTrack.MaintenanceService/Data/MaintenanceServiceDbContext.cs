@@ -106,7 +106,7 @@ namespace TechTrack.MaintenanceService.Data
                 entity.Property(e => e.Id).HasColumnName("id");
                 entity.Property(e => e.Name).HasColumnName("name");
                 entity.Property(e => e.Description).HasColumnName("description");
-                entity.Property(e => e.ComplitedAt).HasColumnName("complited_at");
+                entity.Property(e => e.CompletedAt).HasColumnName("completed_at");
                 entity.Property(e => e.ResponsibleUserId).HasColumnName("responsible_user_id");
                 entity.Property(e => e.EquipmentId).HasColumnName("equipment_id");
                 entity.Property(e => e.ScheduledDate).HasColumnName("scheduled_date");

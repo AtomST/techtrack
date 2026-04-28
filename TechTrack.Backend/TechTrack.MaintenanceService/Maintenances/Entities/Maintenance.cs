@@ -13,8 +13,9 @@ namespace TechTrack.MaintenanceService.Maintenances.Entities
         public Guid? MaintenanceScheduleRecordId { get; set; }
         public MaintenanceSchedule? MaintenanceScheduleRecord { get; set; }
         public DateTime? ScheduledDate { get; set; }
-        public DateTime? ComplitedAt { get; set; }
-        public Guid ResponsibleUserId { get; set; }
+        public DateTime? CompletedAt { get; set; }
+        public Guid? CompletedByUserId { get; set; }
+        public Guid? ResponsibleUserId { get; set; }
         public int MaintenanceTypeId { get; set; }
         public MaintenanceType? Type { get; set; }
         public int MaintenanceStatusId { get; set; }

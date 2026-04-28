@@ -39,8 +39,22 @@ namespace TechTrack.MaintenanceService.Maintenances
             });
         }
         [HttpPost]
-        [Route("api/maintenance/{maintenanceId:guid}/complete")]
+        [Route("~/api/maintenances/{maintenanceId:guid}/complete")]
         [Authorize(Policy = Policies.EmployeeAccess)]
-        public async Task<IActionResult> CompleteMaintenance()
+        public async Task<IActionResult> CompleteMaintenance(Guid maintenanceId, CompleteMaintenanceHttpRequest request)
+        {
+            var completeMaintenanceRequest = new CompleteMaintenanceRequest
+            {
+                MaintenanceId = maintenanceId,
+                Description = request.Description,
+                MaintenanceTypeId = request.MaintenanceTypeId
+            };
+
+            await maintenanceLogic.CompleteMaintenanceAsync(completeMaintenanceRequest, User.GetPrincipalInfo());
+            return Ok(new SuccessResponse
+            {
+                StatusCode = System.Net.HttpStatusCode.OK
+            });
+        }
     }
 }

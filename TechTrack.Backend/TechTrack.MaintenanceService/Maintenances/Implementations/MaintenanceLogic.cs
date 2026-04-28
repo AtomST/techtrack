@@ -7,6 +7,7 @@ using NpgsqlTypes;
 using TechTrack.MaintenanceService.Data;
 using TechTrack.MaintenanceService.Maintenances.Entities;
 using TechTrack.MaintenanceService.Maintenances.Interfaces;
+using TechTrack.MaintenanceService.Maintenances.Models;
 using TechTrack.MaintenanceService.Maintenances.Models.Requests;
 using TechTrack.MaintenanceService.Maintenances.Models.Responses;
 using TechTrack.Shared.Auth;
@@ -32,7 +33,7 @@ namespace TechTrack.MaintenanceService.Maintenances.Implementations
                 Name = request.Name,
                 Description = request.Desctiprion,
                 EquipmentId = request.EquipmentId,
-                ComplitedAt = DateTime.UtcNow,
+                CompletedAt = DateTime.UtcNow,
                 ResponsibleUserId = userInfo.UserId
             };
             await using var tx = await dbContext.Database.BeginTransactionAsync();
@@ -101,6 +102,44 @@ namespace TechTrack.MaintenanceService.Maintenances.Implementations
             (
                 maintenanceLog
             );
+        }
+
+        public async Task CompleteMaintenanceAsync(CompleteMaintenanceRequest request, UserPermissionInfo userInfo)
+        {
+            var maintenanceRecord = await dbContext.MaintenanceLog
+                .FirstOrDefaultAsync(m => m.Id == request.MaintenanceId)
+                ?? throw new NotFoundException("ТО с таким ID не найдено.");
+
+            var equipmentProjection = await dbContext.EquipmentsProjection.AsNoTracking().FirstOrDefaultAsync(p => p.Id == maintenanceRecord.EquipmentId);
+            if (equipmentProjection.CompanyId != userInfo.CompanyId)
+                throw new ForbiddenException("У вас нет доступа к ТО этой компании.");
+
+            if(maintenanceRecord.MaintenanceStatusId == (int)MaintenanceStatusTypes.Completed)
+                throw new InvalidInputException("ТО уже проведено.");
+
+            await UpdateCompletedMaintenanceProperties(
+                maintenanceRecord, 
+                request, 
+                userInfo.UserId
+            );
+            await dbContext.SaveChangesAsync();
+            return;
+        }
+
+        private async Task UpdateCompletedMaintenanceProperties(Maintenance record, CompleteMaintenanceRequest newProperties, Guid completedByUserId)
+        {
+            record.MaintenanceStatusId = (int)MaintenanceStatusTypes.Completed;
+            record.Description = newProperties.Description;
+            record.CompletedByUserId = completedByUserId;
+            record.CompletedAt = DateTime.UtcNow;
+
+            if(newProperties.MaintenanceTypeId != null)
+            {
+                var type = await dbContext.MaintenanceTypes.FirstOrDefaultAsync(t => t.Id == newProperties.MaintenanceTypeId)
+                    ?? throw new InvalidInputException("MaintenanceType с таким ID не существует.");
+
+                record.MaintenanceTypeId = type.Id;
+            }
         }
     }
 }
