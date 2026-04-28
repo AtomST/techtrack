@@ -26,7 +26,7 @@ namespace TechTrack.UserService.Logic.gRPC
 
         public override async Task<IsUserExistsResponse> IsUserExists(IsUserExistsRequest request, ServerCallContext context)
         {
-            if (Guid.TryParse(request.UserId, out var guidUserId))
+            if (!Guid.TryParse(request.UserId, out var guidUserId))
                 throw new RpcException(
                     new Status(
                         StatusCode.InvalidArgument,

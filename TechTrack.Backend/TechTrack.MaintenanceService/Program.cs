@@ -76,10 +76,10 @@ namespace TechTrack.MaintenanceService
             builder.Services.AddScoped<IIssuesLogic, IssuesLogic>();
             builder.Services.AddScoped<IMaintenanceLogic, MaintenanceLogic>();
             builder.Services.AddScoped<ICacheLogic, CacheLogic>();
-            builder.Services.AddScoped<IScheduleLogic, ScheduleLogic>();
             builder.Services.AddScoped<IUserDepartmentCacheHelper, UserDepartmentCacheHelper>();
             builder.Services.AddScoped<IUserDepartmentLogic, UserDepartmentLogic>();
-
+            builder.Services.AddScoped<IScheduleLogic, ScheduleLogic>();
+            
             builder.Services.AddScoped(typeof(SharedDbSeeder<>));
             builder.Services.AddScoped<IEntitySeeder, MaintenanceStatusSeeder>();
             builder.Services.AddScoped<IEntitySeeder, MaintenanceTypeSeeder>();

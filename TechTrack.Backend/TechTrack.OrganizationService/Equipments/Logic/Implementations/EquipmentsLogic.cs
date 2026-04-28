@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using MassTransit;
+using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
 using TechTrack.OrganizationService.Data;
 using TechTrack.OrganizationService.Equipments.Entities;
@@ -14,10 +15,11 @@ namespace TechTrack.OrganizationService.Equipments.Logic.Implementations
     public class EquipmentsLogic : IEquipmentsLogic
     {
         private readonly OrganizationServiceDbContext _dbContext;
-
-        public EquipmentsLogic(OrganizationServiceDbContext dbContext)
+        private readonly IPublishEndpoint _publishEndpoint;
+        public EquipmentsLogic(OrganizationServiceDbContext dbContext, IPublishEndpoint publishEndpoint)
         {
             _dbContext = dbContext;
+            _publishEndpoint = publishEndpoint;
         }
         public async Task<AddEquipmentResponse> AddEquipmentAsync(Guid departmentId, AddEquipmentRequest request)
         {
@@ -46,6 +48,8 @@ namespace TechTrack.OrganizationService.Equipments.Logic.Implementations
 
             await _dbContext.AddAsync(equipment);
             await _dbContext.SaveChangesAsync();
+
+            
 
             return new AddEquipmentResponse { EquipmentId = equipment.Id };
         }

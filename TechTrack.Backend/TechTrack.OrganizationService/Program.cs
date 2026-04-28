@@ -1,7 +1,9 @@
 using MassTransit;
+using TechTrack.OrganizationService.Companies.gRPC;
 using TechTrack.OrganizationService.Companies.Logic.Implementatios;
 using TechTrack.OrganizationService.Companies.Logic.Interfaces;
 using TechTrack.OrganizationService.Data;
+using TechTrack.OrganizationService.Departments.Logic.gRPC;
 using TechTrack.OrganizationService.Departments.Logic.Implementations;
 using TechTrack.OrganizationService.Departments.Logic.Interfaces;
 using TechTrack.OrganizationService.Equipments.EventHandlers;
@@ -71,6 +73,8 @@ namespace TechTrack.OrganizationService
 
             var app = builder.Build();
             app.MapGrpcService<ProjectionGrpcLogic>();
+            app.MapGrpcService<CompanyUserGrpcLogic>();
+            app.MapGrpcService<GetUserDepartmentsGrpcLogic>();
 
             app.UseMiddleware<GlobalExceptionHandler>();
             app.UseMiddleware<JwtAuthenticationMiddleware>();

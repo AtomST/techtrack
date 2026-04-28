@@ -39,6 +39,17 @@ namespace TechTrack.OrganizationService.Departments
                 Data = response.Departments
             });
         }
+        [HttpPost("{departmentId}/employees")]
+        [Authorize(Policy = Policies.ManagementAccess)]
+        public async Task<IActionResult> AddEmployeeById(Guid departmentId, AddEmployeeByIdRequest request)
+        {
+            await _departmentsLogic.AddEmployeeByIdAsync(departmentId, User.GetPrincipalInfo(), request);
+
+            return Ok(new SuccessResponse
+            {
+                StatusCode = System.Net.HttpStatusCode.OK
+            });
+        }
 
         [HttpGet("{departmentId}")]
         [Authorize(Policy = Policies.EmployeeAccess)]
@@ -53,17 +64,6 @@ namespace TechTrack.OrganizationService.Departments
             {
                 StatusCode = System.Net.HttpStatusCode.OK,
                 Data = response.Department
-            });
-        }
-        [HttpPost("{departmentId}/employees")]
-        [Authorize(Policy = Policies.ManagementAccess)]
-        public async Task<IActionResult> AddEmployeeById(Guid departmentId, AddEmployeeByIdRequest request)
-        {
-            await _departmentsLogic.AddEmployeeByIdAsync(departmentId, User.GetPrincipalInfo(),request);
-
-            return Ok(new SuccessResponse
-            {
-                StatusCode = System.Net.HttpStatusCode.OK
             });
         }
 
