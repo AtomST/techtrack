@@ -7,7 +7,7 @@ using TechTrack.Shared.Responses;
 namespace TechTrack.MaintenanceService.Projections
 {
     [ApiController]
-    [Route("api/maintenance/[controller]")]
+    [Route("api/maintenances/[controller]")]
     public class ProjectionsController : ControllerBase
     {
         private readonly IProjectionLogic _projectionLogic;
