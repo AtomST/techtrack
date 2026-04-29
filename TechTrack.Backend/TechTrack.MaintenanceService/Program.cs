@@ -1,4 +1,6 @@
 using MassTransit;
+using TechTrack.MaintenanceService.Background;
+using TechTrack.MaintenanceService.Background.Processors;
 using TechTrack.MaintenanceService.Data;
 using TechTrack.MaintenanceService.Data.EntitySeeders;
 using TechTrack.MaintenanceService.Issues.Logic.Implementations;
@@ -86,6 +88,9 @@ namespace TechTrack.MaintenanceService
             builder.Services.AddScoped<IEntitySeeder, ScheduleRecurrenceTypeSeeder>();
 
             builder.Services.AddScoped<MaintenanceServiceDbSeeder>();
+
+            builder.Services.AddScoped<IBackgroundProcessor, OverdueMaintenanceProcessor>();
+            builder.Services.AddHostedService<MaintenanceWorker>();
 
             var app = builder.Build();
 
