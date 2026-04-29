@@ -10,10 +10,10 @@ namespace TechTrack.MaintenanceService.Data
 {
     public class MaintenanceServiceDbContext : DbContext
     {
-        private IConfiguration _configuratoin;
+        private IConfiguration _configuration;
         public MaintenanceServiceDbContext(DbContextOptions<MaintenanceServiceDbContext> options, IConfiguration configuration) : base(options)
         {
-            _configuratoin = configuration;
+            _configuration = configuration;
         }
 
         public DbSet<Issue> Issues { get; set; }
@@ -30,7 +30,7 @@ namespace TechTrack.MaintenanceService.Data
         {
             if(!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseNpgsql(_configuratoin.GetConnectionString("MaintenanceServiceDbConnection"))
+                optionsBuilder.UseNpgsql(_configuration.GetConnectionString("MaintenanceServiceDbConnection"))
                     .UseSnakeCaseNamingConvention();
             }
         }
