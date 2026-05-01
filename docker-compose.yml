@@ -65,7 +65,18 @@ services:
       - postgres_maintenance_data:/var/lib/postgresql/data
     ports:
       - "5435:5432"
-  
+
+  postgres-notification:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: notification_service
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    volumes:
+      - postgres_notification_data:/var/lib/postgresql/data
+    ports:
+      - "5436:5432"
+
   organization-service:
     build:
       context: .
@@ -130,6 +141,22 @@ services:
       - rabbitmq
       - api-gateway
 
+  notification-service:
+    build:
+      context: .
+      dockerfile: TechTrack.Backend/TechTrack.MaintenanceService/Dockerfile
+    expose:
+      - "8080"
+      - "8081"
+    environment:
+      - ConnectionStrings__NotificationServiceDbContext=Host=postgres-notification;Port=5436;Database=notification_service;Username=postgres;Password=admin
+      - Jwt__Issuer=http://auth-service:8080
+      - Jwt__AccessTokenKey=5c6dd372771c07a19980ce9ad6f251f3ea8f9974a85a943152a68906a2708f7d
+    depends_on:
+      - postgres-maintenance
+      - rabbitmq
+      - api-gateway
+
   frontend:
     build:
       context: TechTrack.Frontend
@@ -150,4 +177,5 @@ volumes:
   postgres_user_data:
   postgres_organization_data:
   postgres_maintenance_data:
+  postgres_notification_data:
   rabbitmq_data:
