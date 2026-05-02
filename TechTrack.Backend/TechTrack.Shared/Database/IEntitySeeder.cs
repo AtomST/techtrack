@@ -8,6 +8,7 @@ namespace TechTrack.Shared.Database
 {
     public interface IEntitySeeder
     {
+        int Order { get; }
         Task SeedAsync();
     }
 }

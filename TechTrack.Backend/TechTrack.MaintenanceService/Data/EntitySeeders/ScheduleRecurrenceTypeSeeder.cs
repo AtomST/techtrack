@@ -6,6 +6,8 @@ namespace TechTrack.MaintenanceService.Data.EntitySeeders
 {
     public class ScheduleRecurrenceTypeSeeder(SharedDbSeeder<MaintenanceServiceDbContext> dbSeeder) : IEntitySeeder
     {
+        public int Order => 1;
+
         public async Task SeedAsync()
         {
             var data = new[]
