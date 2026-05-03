@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using MassTransit;
+using Microsoft.EntityFrameworkCore;
 using TechTrack.NotificationService.Notification.Entities;
 using TechTrack.NotificationService.Projections.Entities;
 
@@ -24,5 +25,12 @@ namespace TechTrack.NotificationService.Data
         public DbSet<NotificationTemplate> NotificationTemplates { get; set; }
         public DbSet<NotificationType> NotificationTypes { get; set; }
         public DbSet<UserContact> UserContacts { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.AddInboxStateEntity();
+            modelBuilder.AddOutboxMessageEntity();
+            modelBuilder.AddOutboxStateEntity();
+        }
     }
 }

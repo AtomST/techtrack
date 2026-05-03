@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TechTrack.NotificationService.Data;
@@ -11,9 +12,11 @@ using TechTrack.NotificationService.Data;
 namespace TechTrack.NotificationService.Data.Migrations
 {
     [DbContext(typeof(NotificationServiceDbContext))]
-    partial class NotificationServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260503150429_AddInboxOutbox")]
+    partial class AddInboxOutbox
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
