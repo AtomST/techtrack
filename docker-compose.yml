@@ -144,16 +144,16 @@ services:
   notification-service:
     build:
       context: .
-      dockerfile: TechTrack.Backend/TechTrack.MaintenanceService/Dockerfile
+      dockerfile: TechTrack.Backend/TechTrack.NotificationService/Dockerfile
     expose:
       - "8080"
       - "8081"
     environment:
-      - ConnectionStrings__NotificationServiceDbContext=Host=postgres-notification;Port=5436;Database=notification_service;Username=postgres;Password=admin
+      - ConnectionStrings__NotificationServiceDbConnection=Host=postgres-notification;Database=notification_service;Username=postgres;Password=admin
       - Jwt__Issuer=http://auth-service:8080
       - Jwt__AccessTokenKey=5c6dd372771c07a19980ce9ad6f251f3ea8f9974a85a943152a68906a2708f7d
     depends_on:
-      - postgres-maintenance
+      - postgres-notification
       - rabbitmq
       - api-gateway
 
