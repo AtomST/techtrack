@@ -28,20 +28,24 @@ namespace TechTrack.MaintenanceService.Maintenances.Implementations
 
             var existingIssues = await GetAndValidateExistingIssueIds(request.SolvedIssuesId, request.EquipmentId);
 
+            var now = DateTime.UtcNow;
+            var maintenanceType = await dbContext.MaintenanceTypes.FirstOrDefaultAsync(t => t.Id == (int)MaintenanceTypes.Repair);
             var maintenance = new Maintenance
             {
                 Name = request.Name,
                 Description = request.Desctiprion,
                 EquipmentId = request.EquipmentId,
-                CompletedAt = DateTime.UtcNow,
-                ResponsibleUserId = userInfo.UserId
+                CompletedAt = now,
+                ResponsibleUserId = userInfo.UserId,
+                MaintenanceTypeId = maintenanceType.Id,
+                MaintenanceStatusId = (int)MaintenanceStatusTypes.Completed
             };
             await using var tx = await dbContext.Database.BeginTransactionAsync();
 
             await dbContext.MaintenanceLog.AddAsync(maintenance);
             await dbContext.SaveChangesAsync();
 
-            var resolvedIssues = ResolveIssues(existingIssues, maintenance.Id);
+            var resolvedIssues = await ResolveIssues(existingIssues, maintenance.Id);
 
             var maxEquipmentStatusCode = await dbContext.Issues
                 .AsNoTracking()
@@ -55,6 +59,18 @@ namespace TechTrack.MaintenanceService.Maintenances.Implementations
             {
                 EquipmentId = request.EquipmentId,
                 MaxIssueStatusCode = maxEquipmentStatusCode
+            });
+
+            await publishEndpoint.Publish(new MaintenanceCompletedEvent
+            {
+                CompletedAt = now,
+                EquipmentId = request.EquipmentId,
+                ScheduledByUserId = userInfo.UserId,
+                CompletedByUserId = userInfo.UserId,
+                MaintenanceId = maintenance.Id,
+                MaintenanceName = request.Name,
+                MaintenanceTypeName = maintenanceType.NameRu,
+                EquipmentName = equipmentProjection.Name,
             });
 
             await dbContext.SaveChangesAsync();

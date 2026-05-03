@@ -65,7 +65,8 @@ namespace TechTrack.OrganizationService.Equipments.Logic.gRPC
             {
                 response.Equipments.Add(new Equipment
                 {
-                    Id = equipment.Id.ToString()
+                    Id = equipment.Id.ToString(),
+                    Name = equipment.Name,
                 });
             }
             return response;

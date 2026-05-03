@@ -16,6 +16,7 @@ message GetDepartmentEquipmentsRequest{
 
 message Equipment{
 	string id = 1;
+	string name = 2;
 }
 
 message GetDepartmentEquipmentsResponse{

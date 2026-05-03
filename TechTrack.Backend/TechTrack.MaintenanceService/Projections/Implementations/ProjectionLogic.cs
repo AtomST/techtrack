@@ -58,6 +58,7 @@ namespace TechTrack.MaintenanceService.Projections.Implementations
                     Id = Guid.Parse(e.Id),
                     DepartmentId = Guid.Parse(grpcResponse.DepartmentId),
                     CompanyId = Guid.Parse(grpcResponse.CompanyId),
+                    Name = e.Name
                 })
                 .ToList();
 
