@@ -9,7 +9,6 @@ using TechTrack.MaintenanceService.Issues.Logic.Models.Responses;
 using TechTrack.Shared.Auth;
 using TechTrack.Shared.Events;
 using TechTrack.Shared.Exceptions;
-using TechTrack.Shared.Protos;
 
 namespace TechTrack.MaintenanceService.Issues.Logic.Implementations
 {
@@ -33,21 +32,31 @@ namespace TechTrack.MaintenanceService.Issues.Logic.Implementations
             {
                 Name = request.Name,
                 StatusId = request.StatusId,
-                Description = request.Desctiption,
+                Description = request.Description,
                 EquipmentStatus = equipmentStatus,
                 CreatedAt = DateTime.UtcNow,
                 CreatorId = userInfo.UserId,
                 EquipmentId = request.EquipmentId,
             };
 
-            _dbContext.Issues.Add(issue);
-            await _dbContext.SaveChangesAsync();
-            
+            await _dbContext.Issues.AddAsync(issue);
             await _publishEndpoint.Publish(new IssueRegistred
             {
                 EquipmentId = request.EquipmentId,
                 StatusId = request.StatusId,
             });
+
+            if (equipmentStatus.Id == (int)IssueTypes.Red)
+                await _publishEndpoint.Publish(new CriticalIssueDetectedEvent
+                {
+                    EquipmentId = equipmentProjection.Id,
+                    EquipmentName = equipmentProjection.Name,
+                    IssueName = request.Name,
+                    IssueDescription = request.Description,
+                    ResponsibleUserId = equipmentProjection.ResponsibleUserId
+                });
+
+            await _dbContext.SaveChangesAsync();
 
             return new CreateIssueResponse(issue.Id);
 

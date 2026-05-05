@@ -49,13 +49,13 @@ namespace TechTrack.OrganizationService
                         h.Password(builder.Configuration["RabbitMQ:Password"]);
                     });
 
-                    cfg.ReceiveEndpoint("issue-registred", e =>
+                    cfg.ReceiveEndpoint("organization.issue-registred", e =>
                     {
                         e.AutoDelete = false;
                         e.ConfigureConsumer<IssueRegistredEventHandler>(context);
                     });
 
-                    cfg.ReceiveEndpoint("maintenance-added", e =>
+                    cfg.ReceiveEndpoint("organization.maintenance-added", e =>
                     {
                         e.AutoDelete = false;
                         e.ConfigureConsumer<MaintenanceAddedEventHandler>(context);

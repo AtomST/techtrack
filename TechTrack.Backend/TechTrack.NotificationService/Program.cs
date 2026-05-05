@@ -35,10 +35,12 @@ namespace TechTrack.NotificationService
             builder.Services.AddScoped<TemplateDictionaryMapper>();
             builder.Services.AddScoped<ITemplateModelMapper<MaintenanceCompletedMapperModel>, MaintenanceCompletedMapper>();
             builder.Services.AddScoped<ITemplateModelMapper<MaintenanceOverdueMapperModel>, MaintenanceOverdueMapper>();
+            builder.Services.AddScoped<ITemplateModelMapper<CriticalIssueDetectedMapperModel>, CriticalIssueDetectedMapper>();
             builder.Services.AddMassTransit(x =>
             {
                 x.AddConsumer<MaintenanceCompletedHandler>();
                 x.AddConsumer<MaintenanceOverdueHandler>();
+                x.AddConsumer<CriticalIssueDetectedHandler>();
                 x.AddEntityFrameworkOutbox<NotificationServiceDbContext>(c =>
                 {
                     c.UsePostgres();
@@ -52,13 +54,17 @@ namespace TechTrack.NotificationService
                         h.Password(builder.Configuration["RabbitMQ:Password"]);
                     });
 
-                    cfg.ReceiveEndpoint("maintenance-completed", e =>
+                    cfg.ReceiveEndpoint("notification.maintenance-completed", e =>
                     {
                         e.ConfigureConsumer<MaintenanceCompletedHandler>(context);
                     });
-                    cfg.ReceiveEndpoint("maintenance-overdue", e =>
+                    cfg.ReceiveEndpoint("notification.maintenance-overdue", e =>
                     {
                         e.ConfigureConsumer<MaintenanceOverdueHandler>(context);
+                    });
+                    cfg.ReceiveEndpoint("notificaiton.criticalissue-detected", e =>
+                    {
+                        e.ConfigureConsumer<CriticalIssueDetectedHandler>(context);
                     });
                 });
             });

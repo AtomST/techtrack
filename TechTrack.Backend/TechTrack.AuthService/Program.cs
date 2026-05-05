@@ -45,18 +45,18 @@ namespace TechTrack.AuthService
                         h.Password(builder.Configuration["RabbitMQ:Password"]);
                     });
 
-                    cfg.ReceiveEndpoint("role-changed", e =>
+                    cfg.ReceiveEndpoint("auth.role-changed", e =>
                     {
                         e.AutoDelete = false;
                         e.ConfigureConsumer<UserRoleChangedHandler>(context);
                     });
 
-                    cfg.ReceiveEndpoint("company-changed", e => 
+                    cfg.ReceiveEndpoint("auth.company-changed", e => 
                     {
                         e.AutoDelete = false;
                         e.ConfigureConsumer<UserCompanyChangedHandler>(context);
                     });
-                    cfg.ReceiveEndpoint("company-registered-withowner", e =>
+                    cfg.ReceiveEndpoint("auth.company-registered-withowner", e =>
                     {
                         e.AutoDelete = false;
                         e.ConfigureConsumer<CompanyRegisteredWithOwnerHandler>(context);

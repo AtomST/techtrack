@@ -1,10 +1,10 @@
 ﻿using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using TechTrack.MaintenanceService.Data.SharedEntities;
+using TechTrack.MaintenanceService.Equipments.Entities;
 using TechTrack.MaintenanceService.Issues.Entities;
 using TechTrack.MaintenanceService.Maintenances.Entities;
 using TechTrack.MaintenanceService.Schedule.Entities;
-using TechTrack.OrganizationService.Equipments.Entities;
 
 namespace TechTrack.MaintenanceService.Data
 {

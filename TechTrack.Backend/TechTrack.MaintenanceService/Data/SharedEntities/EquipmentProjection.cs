@@ -6,5 +6,6 @@
         public string Name { get; set; }
         public Guid DepartmentId { get; set; }
         public Guid CompanyId { get; set; }
+        public Guid? ResponsibleUserId { get; set; }
     }
 }

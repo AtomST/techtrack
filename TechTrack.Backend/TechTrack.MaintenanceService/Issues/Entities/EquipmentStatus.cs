@@ -1,6 +1,6 @@
 ﻿using TechTrack.MaintenanceService.Issues.Entities;
 
-namespace TechTrack.OrganizationService.Equipments.Entities
+namespace TechTrack.MaintenanceService.Equipments.Entities
 {
     public class EquipmentStatus
     {

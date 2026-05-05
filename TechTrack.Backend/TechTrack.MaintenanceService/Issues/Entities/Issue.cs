@@ -1,4 +1,4 @@
-﻿using TechTrack.OrganizationService.Equipments.Entities;
+﻿using TechTrack.MaintenanceService.Equipments.Entities;
 
 namespace TechTrack.MaintenanceService.Issues.Entities
 {

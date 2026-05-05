@@ -2,18 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TechTrack.OrganizationService.Data;
 
 #nullable disable
 
-namespace TechTrack.OrganizationService.Migrations
+namespace TechTrack.OrganizationService.Data.Migrations
 {
     [DbContext(typeof(OrganizationServiceDbContext))]
-    partial class OrganizationServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260505061854_AddResponsibleUserPropertyToEquipment")]
+    partial class AddResponsibleUserPropertyToEquipment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
