@@ -10,6 +10,7 @@ using TechTrack.OrganizationService.Equipments.EventHandlers;
 using TechTrack.OrganizationService.Equipments.Logic.gRPC;
 using TechTrack.OrganizationService.Equipments.Logic.Implementations;
 using TechTrack.OrganizationService.Equipments.Logic.Interfaces;
+using TechTrack.OrganizationService.UserProjections.Logic.EventHandlers;
 using TechTrack.Shared.Auth;
 using TechTrack.Shared.Filters;
 using TechTrack.Shared.Logic;
@@ -41,6 +42,7 @@ namespace TechTrack.OrganizationService
             {
                 x.AddConsumer<IssueRegistredEventHandler>();
                 x.AddConsumer<MaintenanceAddedEventHandler>();
+                x.AddConsumer<UserCreatedEventHandler>();
                 x.UsingRabbitMq((context, cfg) =>
                 {
                     cfg.Host(builder.Configuration["RabbitMQ:Host"], "/", h =>
@@ -59,6 +61,10 @@ namespace TechTrack.OrganizationService
                     {
                         e.AutoDelete = false;
                         e.ConfigureConsumer<MaintenanceAddedEventHandler>(context);
+                    });
+                    cfg.ReceiveEndpoint("organization.user-created", e =>
+                    {
+                        e.ConfigureConsumer<UserCreatedEventHandler>(context);
                     });
                 });
             });

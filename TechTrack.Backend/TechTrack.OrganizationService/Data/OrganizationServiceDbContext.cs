@@ -2,6 +2,7 @@
 using TechTrack.OrganizationService.Companies.Entities;
 using TechTrack.OrganizationService.Departments.Entities;
 using TechTrack.OrganizationService.Equipments.Entities;
+using TechTrack.OrganizationService.UserProjections.Entities;
 
 namespace TechTrack.OrganizationService.Data
 {
@@ -18,13 +19,15 @@ namespace TechTrack.OrganizationService.Data
         public DbSet<Department> Departments { get; set; }
         public DbSet<DepartmentUser> DepartmentUsers { get; set; }
         public DbSet<Equipment> Equipments { get; set; }
+        public DbSet<UserProjection> UserProjections { get; set; }
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseNpgsql(_configuration.GetConnectionString("OrganizationServiceDbConnection"));
+                optionsBuilder.UseNpgsql(_configuration.GetConnectionString("OrganizationServiceDbConnection"))
+                    .UseSnakeCaseNamingConvention();
             }
         }
 

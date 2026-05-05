@@ -2,18 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TechTrack.OrganizationService.Data;
 
 #nullable disable
 
-namespace TechTrack.OrganizationService.Migrations
+namespace TechTrack.OrganizationService.Data.Migrations
 {
     [DbContext(typeof(OrganizationServiceDbContext))]
-    partial class OrganizationServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260505110634_AddUserProjectionTable")]
+    partial class AddUserProjectionTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,8 +38,7 @@ namespace TechTrack.OrganizationService.Migrations
                         .HasColumnName("address");
 
                     b.Property<Guid?>("CompanyHeadId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("company_head_id");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("ConnectedAt")
                         .ValueGeneratedOnAdd()
@@ -49,8 +51,7 @@ namespace TechTrack.OrganizationService.Migrations
                         .HasColumnType("text")
                         .HasColumnName("name");
 
-                    b.HasKey("Id")
-                        .HasName("pk_companies");
+                    b.HasKey("Id");
 
                     b.ToTable("companies", (string)null);
                 });
@@ -69,11 +70,9 @@ namespace TechTrack.OrganizationService.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("joined_at");
 
-                    b.HasKey("UserId", "CompanyId")
-                        .HasName("pk_company_user");
+                    b.HasKey("UserId", "CompanyId");
 
-                    b.HasIndex("CompanyId")
-                        .HasDatabaseName("ix_company_user_company_id");
+                    b.HasIndex("CompanyId");
 
                     b.ToTable("company_user", (string)null);
                 });
@@ -98,11 +97,9 @@ namespace TechTrack.OrganizationService.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("responsible_user_id");
 
-                    b.HasKey("Id")
-                        .HasName("pk_departments");
+                    b.HasKey("Id");
 
-                    b.HasIndex("CompanyId")
-                        .HasDatabaseName("ix_departments_company_id");
+                    b.HasIndex("CompanyId");
 
                     b.ToTable("departments", (string)null);
                 });
@@ -121,11 +118,9 @@ namespace TechTrack.OrganizationService.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("joined_at");
 
-                    b.HasKey("UserId", "DepartmentId")
-                        .HasName("pk_department_user");
+                    b.HasKey("UserId", "DepartmentId");
 
-                    b.HasIndex("DepartmentId")
-                        .HasDatabaseName("ix_department_user_department_id");
+                    b.HasIndex("DepartmentId");
 
                     b.ToTable("department_user", (string)null);
                 });
@@ -155,19 +150,16 @@ namespace TechTrack.OrganizationService.Migrations
                         .HasColumnName("name");
 
                     b.Property<Guid?>("ResponsibleUserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("responsible_user_id");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("SerialNumber")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("serialNumber");
 
-                    b.HasKey("Id")
-                        .HasName("pk_equipments");
+                    b.HasKey("Id");
 
-                    b.HasIndex("DepartmentId")
-                        .HasDatabaseName("ix_equipments_department_id");
+                    b.HasIndex("DepartmentId");
 
                     b.ToTable("equipments", (string)null);
                 });
@@ -176,18 +168,15 @@ namespace TechTrack.OrganizationService.Migrations
                 {
                     b.Property<Guid>("UserId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("FullName")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("full_name");
+                        .HasColumnType("text");
 
-                    b.HasKey("UserId")
-                        .HasName("pk_user_projections");
+                    b.HasKey("UserId");
 
-                    b.ToTable("user_projections", (string)null);
+                    b.ToTable("UserProjections");
                 });
 
             modelBuilder.Entity("TechTrack.OrganizationService.Companies.Entities.CompanyUser", b =>
@@ -196,8 +185,7 @@ namespace TechTrack.OrganizationService.Migrations
                         .WithMany("UsersInfo")
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_company_user_companies_company_id");
+                        .IsRequired();
 
                     b.Navigation("Company");
                 });
@@ -208,8 +196,7 @@ namespace TechTrack.OrganizationService.Migrations
                         .WithMany("Departments")
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_departments_companies_company_id");
+                        .IsRequired();
 
                     b.Navigation("Company");
                 });
@@ -220,8 +207,7 @@ namespace TechTrack.OrganizationService.Migrations
                         .WithMany("DepartmentEmployees")
                         .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_department_user_departments_department_id");
+                        .IsRequired();
 
                     b.Navigation("Department");
                 });
@@ -232,8 +218,7 @@ namespace TechTrack.OrganizationService.Migrations
                         .WithMany("Equipments")
                         .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_equipments_departments_department_id");
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("TechTrack.OrganizationService.Companies.Entities.Company", b =>
