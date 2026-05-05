@@ -34,9 +34,11 @@ namespace TechTrack.NotificationService
             builder.Services.AddScoped<IEntitySeeder, NotificationTemplateSeeder>();
             builder.Services.AddScoped<TemplateDictionaryMapper>();
             builder.Services.AddScoped<ITemplateModelMapper<MaintenanceCompletedMapperModel>, MaintenanceCompletedMapper>();
+            builder.Services.AddScoped<ITemplateModelMapper<MaintenanceOverdueMapperModel>, MaintenanceOverdueMapper>();
             builder.Services.AddMassTransit(x =>
             {
                 x.AddConsumer<MaintenanceCompletedHandler>();
+                x.AddConsumer<MaintenanceOverdueHandler>();
                 x.AddEntityFrameworkOutbox<NotificationServiceDbContext>(c =>
                 {
                     c.UsePostgres();
@@ -53,6 +55,10 @@ namespace TechTrack.NotificationService
                     cfg.ReceiveEndpoint("maintenance-completed", e =>
                     {
                         e.ConfigureConsumer<MaintenanceCompletedHandler>(context);
+                    });
+                    cfg.ReceiveEndpoint("maintenance-overdue", e =>
+                    {
+                        e.ConfigureConsumer<MaintenanceOverdueHandler>(context);
                     });
                 });
             });

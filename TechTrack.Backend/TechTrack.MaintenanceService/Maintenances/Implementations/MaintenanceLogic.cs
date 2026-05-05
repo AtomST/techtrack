@@ -1,4 +1,5 @@
 ﻿using MassTransit;
+using MassTransit.Middleware;
 using MassTransit.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -10,6 +11,7 @@ using TechTrack.MaintenanceService.Maintenances.Interfaces;
 using TechTrack.MaintenanceService.Maintenances.Models;
 using TechTrack.MaintenanceService.Maintenances.Models.Requests;
 using TechTrack.MaintenanceService.Maintenances.Models.Responses;
+using TechTrack.MaintenanceService.Schedule.Models;
 using TechTrack.Shared.Auth;
 using TechTrack.Shared.Events;
 using TechTrack.Shared.Exceptions;
@@ -138,6 +140,29 @@ namespace TechTrack.MaintenanceService.Maintenances.Implementations
                 request, 
                 userInfo.UserId
             );
+
+            var scheduleTemplate = await dbContext.MaintenanceSchedule
+                .FirstOrDefaultAsync(x => x.Id == maintenanceRecord.MaintenanceScheduleRecordId);
+
+            var nextMaintenanceDate = CalculateNextMaintenanceDate(
+                scheduleTemplate.NextMaintenanceDate,
+                scheduleTemplate.RecurrenceTypeId,
+                scheduleTemplate.IntervalValue
+            );
+
+            scheduleTemplate.NextMaintenanceDate = nextMaintenanceDate;
+
+            var newScheduledMaintenance = new Maintenance
+            {
+                Name = scheduleTemplate.MaintenanceName,
+                MaintenanceScheduleRecord = scheduleTemplate,
+                MaintenanceStatusId = (int)MaintenanceStatusTypes.Scheduled,
+                MaintenanceTypeId = (int)MaintenanceTypes.Preventive,
+                EquipmentId = scheduleTemplate.EquipmentId,
+                ResponsibleUserId = scheduleTemplate.ResponsibleUserId,
+                ScheduledDate = nextMaintenanceDate
+            };
+            await dbContext.AddAsync(newScheduledMaintenance);
             await dbContext.SaveChangesAsync();
             return;
         }
@@ -156,6 +181,27 @@ namespace TechTrack.MaintenanceService.Maintenances.Implementations
 
                 record.MaintenanceTypeId = type.Id;
             }
+        }
+
+        private DateTime CalculateNextMaintenanceDate(DateTime pastMaintenanceDate, int recurrenceTypeId, int intervalValue)
+        {
+            DateTime nextMaintenanceDate;
+
+            switch (recurrenceTypeId)
+            {
+                case (int)ScheduleRecurrenceTypes.Day:
+                    nextMaintenanceDate = pastMaintenanceDate.AddDays(intervalValue);
+                    break;
+                case (int)ScheduleRecurrenceTypes.Week:
+                    nextMaintenanceDate = pastMaintenanceDate.AddDays(7 * intervalValue);
+                    break;
+                case (int)ScheduleRecurrenceTypes.Month:
+                    nextMaintenanceDate = pastMaintenanceDate.AddMonths(intervalValue);
+                    break;
+                default: throw new NotImplementedException();
+            }
+
+            return nextMaintenanceDate;
         }
     }
 }

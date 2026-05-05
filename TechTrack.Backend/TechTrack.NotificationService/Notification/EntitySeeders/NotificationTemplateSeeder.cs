@@ -27,6 +27,7 @@ namespace TechTrack.NotificationService.Notification.EntitySeeders
 @"Техническое обслуживание «{maintenanceName}» не выполнено вовремя.
 
 Плановая дата: {scheduledDate}
+Оборудование: {equipmentName}
 Ответственный: {responsibleName}
 
 Рекомендуется выполнить обслуживание как можно скорее.";
@@ -52,7 +53,7 @@ namespace TechTrack.NotificationService.Notification.EntitySeeders
                 {
                     Id = 2,
                     NotificationTypeId = (int)NotificationTypes.MaintenanceOverdue,
-                    TitleTemplate = @"{equipmentName} — ТО просрочено на {days} дн.",
+                    TitleTemplate = @"{equipmentName} — ТО просрочено",
                     MessageTemplate = MAINTENANCEOVERDUE_MESSAGE_TEMPLATE,
                 },
                 new NotificationTemplate

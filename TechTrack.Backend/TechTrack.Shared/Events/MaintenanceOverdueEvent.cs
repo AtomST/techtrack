@@ -9,12 +9,10 @@ namespace TechTrack.Shared.Events
     public class MaintenanceOverdueEvent
     {
         public Guid MaintenanceId { get; set; }
-        public Guid EquipmentId { get; set; }
         public string EquipmentName { get; set; }
         public string MaintenanceName { get; set; }
         public DateTime ScheduledDate { get; set; }
-        public Guid ResponsibleUserId { get; set; }
+        public Guid? ResponsibleUserId { get; set; }
         public Guid ScheduledByUserId { get; set; }
-
     }
 }
