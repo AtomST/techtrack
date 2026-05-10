@@ -1,4 +1,10 @@
 ﻿namespace TechTrack.MaintenanceService.Issues.Logic.Models.Request
 {
-    public record CreateIssueRequest(string Name, string? Description, Guid EquipmentId, int StatusId);
+    public record CreateIssueRequest
+    {
+        public string Name { get; set; }
+        public string? Description { get; set; }
+        public Guid EquipmentId { get; set; }
+        public int StatusId { get; set; }
+    }
 }

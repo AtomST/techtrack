@@ -8,7 +8,7 @@ using TechTrack.Shared.Responses;
 namespace TechTrack.MaintenanceService.Issues
 {
     [ApiController]
-    [Route("api/equipments/{equipmentId}/issues")]
+    [Route("api/equipments/{equipmentId:guid}/issues")]
     public class IssuesController : ControllerBase
     {
         private readonly IIssuesLogic _issuesLogic;
@@ -18,10 +18,17 @@ namespace TechTrack.MaintenanceService.Issues
         }
         [HttpPost]
         [Authorize(Policy = Policies.EmployeeAccess)]
-        public async Task<IActionResult> CreateIssue([FromBody] CreateIssueRequest request)
+        public async Task<IActionResult> CreateIssue(Guid equipmentId, CreateIssueHttpRequest request)
         {
 
-            var response = await _issuesLogic.CreateIssueAsync(request, User.GetPrincipalInfo());
+            var serviceRequest = new CreateIssueRequest
+            {
+                Name = request.Name,
+                Description = request.Description,
+                EquipmentId = equipmentId,
+                StatusId = request.StatusId
+            };
+            var response = await _issuesLogic.CreateIssueAsync(serviceRequest, User.GetPrincipalInfo());
             return Created("",new SuccessResponse
             {
                 StatusCode = System.Net.HttpStatusCode.Created,
