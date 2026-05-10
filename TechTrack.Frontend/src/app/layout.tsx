@@ -1,14 +1,5 @@
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { HydrationProvider } from '@/components/providers/HydrationProvider';
 import './globals.css';
-import { Providers } from './providers';
-
-const inter = Inter({ subsets: ['latin', 'cyrillic'] });
-
-export const metadata: Metadata = {
-  title: 'TechTrack - Управление техникой',
-  description: 'Система отслеживания состояния техники в компании',
-};
 
 export default function RootLayout({
   children,
@@ -17,8 +8,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ru">
-      <body className={inter.className}>
-        <Providers>{children}</Providers>
+      <body>
+        <HydrationProvider>{children}</HydrationProvider>
       </body>
     </html>
   );

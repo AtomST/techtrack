@@ -1,176 +1,164 @@
-// Authentication types
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-export interface RegisterRequest {
-  email: string;
-  FullName: string;
-  phoneNumber: string;
-  Password: string;
-}
-
-export interface ApiResponse<T> {
+export interface ApiResponse<T = any> {
   statusCode: number;
-  data: T;
-}
-
-export interface AuthData {
-  accessToken: string;
-}
-
-export interface AuthResponse {
-  statusCode: number;
-  data: AuthData;
-}
-
-export interface DecodedToken {
-  nameid: string;
-  role: string;
-  company_id: string;
-  nbf: number;
-  exp: number;
-  iat: number;
+  data?: T;
+  message?: string;
+  errors?: Record<string, string>;
 }
 
 export interface User {
   id: string;
   email: string;
   fullName: string;
+  role?: string;
   companyId?: string;
-  role: UserRole;
+  departmentId?: string;
 }
 
-export enum UserRole {
-  ADMIN = 'Admin',
-  MANAGER = 'Manager',
-  TECHNICIAN = 'Technician',
-  VIEWER = 'Viewer',
-  UNDEFINED = 'Undefined',
-}
-
-// Company types
-export interface Company {
-  id: string;
-  name: string;
-  description?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface CreateCompanyRequest {
-  name: string;
-  description?: string;
-}
-
-// Department types
 export interface Department {
   id: string;
   name: string;
   companyId: string;
-  company?: Company;
   responsibleUserId?: string;
-  equipments: Equipment[];
+  responsibleUser?: User;
+  equipments?: Equipment[];
 }
 
-export interface CreateDepartmentRequest {
-  name: string;
-  companyId: string;
-  responsibleUserId?: string;
-}
-
-// Equipment types
 export interface Equipment {
   id: string;
   name: string;
-  serialNumber: string;
+  serialNumber?: string;
   description?: string;
-  currentStatusId: number;
-  equipmentStatus?: EquipmentStatus;
+  currentStatusId?: number;
   departmentId: string;
+  responsibleUserId?: string;
+  responsibleUser?: User;
+  createdAt: string;
 }
 
-export interface EquipmentStatus {
-  id: number;
-  name: string;
-}
-
-export interface CreateEquipmentRequest {
-  name: string;
-  serialNumber: string;
-  description?: string;
-  currentStatusId: number;
-  departmentId: string;
-}
-
-// Issue types
 export interface Issue {
   id: string;
+  name: string;
+  description?: string;
   equipmentId: string;
-  title: string;
-  description: string;
-  severity: IssueSeverity;
-  status: IssueStatus;
-  reportedBy: string;
-  assignedTo?: string;
+  statusId: number;
   createdAt: string;
-  updatedAt: string;
-  resolvedAt?: string;
+  creatorId?: string;
+  isResolved?: boolean;
+  resolvedByMaintenanceId?: string;
 }
 
-export enum IssueSeverity {
-  LOW = 'LOW',
-  MEDIUM = 'MEDIUM',
-  HIGH = 'HIGH',
-  CRITICAL = 'CRITICAL',
+export const UserRole = {
+  Undefined: 'Undefined',
+  Dev: 'Dev',
+  Admin: 'Admin',
+  PlatformAdmin: 'PlatformAdmin',
+  Manager: 'Manager',
+  DepartmentHead: 'DepartmentHead',
+  CompanyHead: 'CompanyHead',
+  Employee: 'Employee',
+} as const;
+
+export type UserRoleType = typeof UserRole[keyof typeof UserRole];
+export interface Company {
+  id: string;
+  name: string;
+  createdAt: string;
 }
 
-export enum IssueStatus {
-  OPEN = 'OPEN',
-  IN_PROGRESS = 'IN_PROGRESS',
-  RESOLVED = 'RESOLVED',
-  CLOSED = 'CLOSED',
+
+export enum EquipmentStatus {
+  Operational = 1,  
+  Warning = 2,    
+  Critical = 3,    
+  Maintenance = 4,  
 }
 
-export interface CreateIssueRequest {
-  equipmentId: string;
-  title: string;
-  description: string;
-  severity: IssueSeverity;
-}
-
-// Maintenance types
 export interface Maintenance {
   id: string;
+  name: string;
+  description?: string;
   equipmentId: string;
-  type: MaintenanceType;
-  scheduledDate: string;
-  completedDate?: string;
-  description: string;
-  performedBy?: string;
-  notes?: string;
-  status: MaintenanceStatus;
-  createdAt: string;
-  updatedAt: string;
+  maintenanceScheduleRecordId?: string;
+  scheduledDate?: string;
+  completedAt?: string;
+  completedByUserId?: string;
+  responsibleUserId?: string;
+  maintenanceTypeId: number;
+  maintenanceStatusId: number;
+  solvedIssues?: Issue[];
 }
 
-export enum MaintenanceType {
-  PREVENTIVE = 'PREVENTIVE',
-  CORRECTIVE = 'CORRECTIVE',
-  INSPECTION = 'INSPECTION',
+export interface ScheduleMaintenanceRequest {
+  recurrenceTypeId: number;
+  maintenanceName: string;
+  intervalValue: number;
+  nextMaintenanceDate: string;
+  responsibleUserId: string;
+  notificationAdvanceDays: number;
+}
+
+export interface Notification {
+  id: string;
+  userId: string;
+  relatedEntityId: string;
+  title: string;
+  message: string;
+  notificationTypeId: number;
+  createdAt: string;
 }
 
 export enum MaintenanceStatus {
-  SCHEDULED = 'SCHEDULED',
-  IN_PROGRESS = 'IN_PROGRESS',
-  COMPLETED = 'COMPLETED',
-  CANCELLED = 'CANCELLED',
+  Completed = 1,
+  Cancelled = 2,
+  Scheduled = 3,
+  Overdue = 4
 }
 
-export interface CreateMaintenanceRequest {
+export enum MaintenanceType {
+  Preventive = 1,
+  Repair = 2,
+  Upgrade = 3
+}
+export interface Company {
+  id: string;
+  name: string;
+  createdAt: string;
+}
+export enum RecurrenceType {
+  Day = 1,
+  Week = 2,
+  Month = 3
+}
+
+export enum NotificationType {
+  MaintenanceCompleted = 1,
+  MaintenanceOverdue = 2,
+  MaintenanceReminder = 3,
+  CriticalIssueDetected = 4
+}
+export interface Maintenance {
+  id: string;
+  name: string;
+  description?: string;
   equipmentId: string;
-  type: MaintenanceType;
-  scheduledDate: string;
-  description: string;
+  maintenanceScheduleRecordId?: string;
+  scheduledDate?: string;
+  completedAt?: string;
+  completedByUserId?: string;
+  responsibleUserId?: string;
+  maintenanceTypeId: number;
+  maintenanceStatusId: number;
+  solvedIssues?: Issue[];
+}
+
+export interface MaintenanceSchedule {
+  id: string;
+  equipmentId: string;
+  maintenanceName: string;
+  recurrenceTypeId: number;
+  intervalValue: number;
+  nextMaintenanceDate: string;
+  responsibleUserId: string;
+  notificationAdvanceDays: number;
+  isActive: boolean;
 }
