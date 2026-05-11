@@ -61,6 +61,7 @@ namespace TechTrack.OrganizationService.Companies
         //    return CreatedAtAction
         //}
         [HttpGet("{companyId:guid}/employees")]
+        [Authorize(Policies.AdminAccess)]
         public async Task<IActionResult> GetEmployees(Guid companyId)
         {
             User.AdditionalPolicyValidation(companyId);

@@ -12,6 +12,7 @@ using TechTrack.OrganizationService.Equipments.Logic.Implementations;
 using TechTrack.OrganizationService.Equipments.Logic.Interfaces;
 using TechTrack.OrganizationService.UserProjections.Logic.EventHandlers;
 using TechTrack.Shared.Auth;
+using TechTrack.Shared.Configuration;
 using TechTrack.Shared.Filters;
 using TechTrack.Shared.Logic;
 using TechTrack.Shared.Middleware;
@@ -72,10 +73,7 @@ namespace TechTrack.OrganizationService
             builder.Services.AddScoped<IDepartmentsLogic, DepartmentsLogic>();
             builder.Services.AddScoped<IEquipmentsLogic, EquipmentsLogic>();
 
-            builder.Services.AddControllers(opt =>
-            {
-                opt.Filters.Add<ModelValidationFilter>();
-            });
+            builder.Services.AddCustomControllers();
 
             var app = builder.Build();
             app.MapGrpcService<ProjectionGrpcLogic>();

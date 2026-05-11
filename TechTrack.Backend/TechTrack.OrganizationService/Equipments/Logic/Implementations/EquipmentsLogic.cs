@@ -43,6 +43,7 @@ namespace TechTrack.OrganizationService.Equipments.Logic.Implementations
                 SerialNumber = request.SerialNumber,
                 DepartmentId = departmentId,
                 Description = request.Desctiption,
+                ResponsibleUserId = request.ResponsibleUserId,
                 CurrentStatusId = defaultStatus
             };
 

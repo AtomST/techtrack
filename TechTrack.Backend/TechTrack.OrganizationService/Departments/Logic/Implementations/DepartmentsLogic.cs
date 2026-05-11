@@ -1,5 +1,6 @@
 ﻿using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using TechTrack.OrganizationService.Companies.Models;
 using TechTrack.OrganizationService.Data;
 using TechTrack.OrganizationService.Departments.Entities;
 using TechTrack.OrganizationService.Departments.Logic.Interfaces;
@@ -86,6 +87,44 @@ namespace TechTrack.OrganizationService.Departments.Logic.Implementations
             return new CreateDepartmentResponse(department.Id);
         }
 
+        public async Task<IList<EmployeeInfo>> GetAllDepartmentEmployees(Guid departmentId, UserPermissionInfo userInfo)
+        {
+            var department = await _dbContext.Departments
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == departmentId)
+                ?? throw new NotFoundException("Отдел с таким ID не найден.");
+
+            if (department.CompanyId != userInfo.CompanyId)
+                throw new ForbiddenException("Вы не имеете доступа к этому отделу.");
+
+            if(userInfo.Role == Roles.DepartmentHead || userInfo.Role == Roles.Manager)
+            {
+                var isUserInDepartment = await _dbContext.DepartmentUsers
+                    .AsNoTracking()
+                    .AnyAsync(d =>
+                        d.DepartmentId == departmentId &&
+                        d.UserId == userInfo.UserId);
+
+                if (!isUserInDepartment)
+                    throw new ForbiddenException("Вы не имеете доступа к этому отделу.");
+            }
+
+            var employees = await _dbContext.DepartmentUsers
+                .AsNoTracking()
+                .Where(d => d.DepartmentId == departmentId)
+                .Join(_dbContext.UserProjections,
+                d => d.UserId,
+                u => u.UserId,
+                (d, u) => new EmployeeInfo
+                {
+                    UserId = u.UserId,
+                    FullName = u.FullName
+                })
+                .ToListAsync();
+
+            return employees;
+        }
+
         public async Task<GetAllDepartmentsResponse> GetAllDepartmentsAsync(UserPermissionInfo userInfo)
         {
             var departments = await _dbContext.Departments
@@ -96,6 +135,26 @@ namespace TechTrack.OrganizationService.Departments.Logic.Implementations
             return new GetAllDepartmentsResponse
             {
                 Departments = departments
+            };
+        }
+
+        public async Task<GetAllDepartmentsResponse> GetAllUserDepartmentsAsync(UserPermissionInfo userInfo)
+        {
+            var userDepartments = await _dbContext.Departments
+                .AsNoTracking()
+                .Join(_dbContext.DepartmentUsers,
+                    d => d.Id,
+                    du => du.DepartmentId,
+                    (d, du) => new {Department = d, DepartmentUser = du})
+                .Where(
+                    x => x.Department.CompanyId == userInfo.CompanyId &&
+                    x.DepartmentUser.UserId == userInfo.UserId)
+                .Select(x => x.Department)
+                .ToListAsync();
+
+            return new GetAllDepartmentsResponse
+            {
+                Departments = userDepartments
             };
         }
 

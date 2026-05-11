@@ -25,14 +25,29 @@ namespace TechTrack.OrganizationService.Departments
         public async Task<IActionResult> CreateDepartment(CreateDepartmentRequest request)
         {
             var response = await _departmentsLogic.CreateDepartmentAsync(request, User.GetPrincipalInfo());
-            return Created();
+            return Ok(new SuccessResponse
+            {
+                StatusCode = System.Net.HttpStatusCode.Created,
+                Data = response
+            });
         }
 
         [HttpGet]
-        [Authorize(Policy = Policies.CompanyHeadAccess)]
+        [Authorize(Policy = Policies.AdminAccess)]
         public async Task<IActionResult> GetAllDepartments()
         {
             var response = await _departmentsLogic.GetAllDepartmentsAsync(User.GetPrincipalInfo());
+            return Ok(new SuccessResponse
+            {
+                StatusCode = System.Net.HttpStatusCode.OK,
+                Data = response.Departments
+            });
+        }
+        [HttpGet("my")]
+        [Authorize(Policy = Policies.EmployeeAccess)]
+        public async Task<IActionResult> GetAllUserDepartmentsAsync()
+        {
+            var response = await _departmentsLogic.GetAllUserDepartmentsAsync(User.GetPrincipalInfo());
             return Ok(new SuccessResponse
             {
                 StatusCode = System.Net.HttpStatusCode.OK,
@@ -50,7 +65,6 @@ namespace TechTrack.OrganizationService.Departments
                 StatusCode = System.Net.HttpStatusCode.OK
             });
         }
-
         [HttpGet("{departmentId}")]
         [Authorize(Policy = Policies.EmployeeAccess)]
         public async Task<IActionResult> GetFullDepartmentInfoById(Guid departmentId)
@@ -64,6 +78,18 @@ namespace TechTrack.OrganizationService.Departments
             {
                 StatusCode = System.Net.HttpStatusCode.OK,
                 Data = response.Department
+            });
+        }
+
+        [HttpGet("{departmentId}/employees")]
+        [Authorize(Policy = Policies.ManagementAccess)]
+        public async Task<IActionResult> GetAllDepartmentEmployees(Guid departmentId)
+        {
+            var response = await _departmentsLogic.GetAllDepartmentEmployees(departmentId, User.GetPrincipalInfo());
+            return Ok(new SuccessResponse
+            {
+                StatusCode = System.Net.HttpStatusCode.OK,
+                Data = response
             });
         }
 
