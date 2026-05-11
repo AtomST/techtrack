@@ -2,6 +2,8 @@ using MassTransit;
 using TechTrack.NotificationService.Data;
 using TechTrack.NotificationService.Notification.EntitySeeders;
 using TechTrack.NotificationService.Notification.Logic.EventHandlers;
+using TechTrack.NotificationService.Notification.Logic.Implementations;
+using TechTrack.NotificationService.Notification.Logic.Interfaces;
 using TechTrack.NotificationService.Notification.Logic.Mappers;
 using TechTrack.NotificationService.Notification.Logic.Mappers.Models;
 using TechTrack.Shared.Auth;
@@ -32,6 +34,7 @@ namespace TechTrack.NotificationService
             builder.Services.AddScoped<IEntitySeeder, NotificationTypeSeeder>();
             builder.Services.AddScoped<IEntitySeeder, NotificationTemplateSeeder>();
             builder.Services.AddScoped<IEntitySeeder, NotificationTemplateSeeder>();
+            builder.Services.AddScoped<INotificationLogic, NotificationLogic>();
             builder.Services.AddScoped<TemplateDictionaryMapper>();
             builder.Services.AddScoped<ITemplateModelMapper<MaintenanceCompletedMapperModel>, MaintenanceCompletedMapper>();
             builder.Services.AddScoped<ITemplateModelMapper<MaintenanceOverdueMapperModel>, MaintenanceOverdueMapper>();
