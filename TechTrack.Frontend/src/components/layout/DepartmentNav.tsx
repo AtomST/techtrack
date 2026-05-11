@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/Button';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { CreateDepartmentModal } from '@/components/modals/CreateDepartmentModal';
 import { CreateEquipmentModal } from '@/components/modals/CreateEquipmentModal';
-import { useCompanyStore } from '@/store/companyStore';
+import { useDepartmentStore } from '@/store/departmentStore';
+import { departmentService } from '@/services/api/departments';
 
 interface DepartmentNavProps {
   departments: Department[];
@@ -39,13 +40,9 @@ export function DepartmentNav({
   onSelectDepartment,
   onSelectEquipment,
 }: DepartmentNavProps) {
-  const { 
-    departmentsDetailsMap, 
-    loadingDepartmentDetails, 
-    fetchDepartmentDetails 
-  } = useCompanyStore();
-  
   const [expandedDepartments, setExpandedDepartments] = useState<Set<string>>(new Set());
+  const [equipmentsMap, setEquipmentsMap] = useState<Record<string, Equipment[]>>({});
+  const [loadingEquipments, setLoadingEquipments] = useState<Record<string, boolean>>({});
   const [showCreateDepartment, setShowCreateDepartment] = useState(false);
   const [showCreateEquipment, setShowCreateEquipment] = useState(false);
   const [selectedDeptForEquipment, setSelectedDeptForEquipment] = useState<Department | null>(null);
@@ -55,31 +52,38 @@ export function DepartmentNav({
   const canCreateEquipment = role === 'Admin' || role === 'CompanyHead' || role === 'PlatformAdmin' ||
                             role === 'DepartmentHead' || role === 'Manager';
 
-  const handleDepartmentClick = async (dept: Department) => {
-    onSelectDepartment(dept);
+  const loadEquipments = async (departmentId: string) => {
+    if (equipmentsMap[departmentId]) return;
     
-    const isExpanded = expandedDepartments.has(dept.id);
-    
-    if (!isExpanded) {
-      const newExpanded = new Set(expandedDepartments);
-      newExpanded.add(dept.id);
-      setExpandedDepartments(newExpanded);
-      await fetchDepartmentDetails(dept.id);
-    } else {
-      const newExpanded = new Set(expandedDepartments);
-      newExpanded.delete(dept.id);
-      setExpandedDepartments(newExpanded);
+    setLoadingEquipments(prev => ({ ...prev, [departmentId]: true }));
+    try {
+      const department = await departmentService.getDepartment(departmentId);
+      const equipments = department.equipments || [];
+      setEquipmentsMap(prev => ({ ...prev, [departmentId]: equipments }));
+    } catch (error) {
+      console.error('Failed to load equipments:', error);
+    } finally {
+      setLoadingEquipments(prev => ({ ...prev, [departmentId]: false }));
     }
   };
 
-  const getEquipments = (deptId: string): Equipment[] => {
-    const details = departmentsDetailsMap[deptId];
-    return details?.equipments || [];
+  const toggleDepartment = async (deptId: string) => {
+    const newExpanded = new Set(expandedDepartments);
+    if (newExpanded.has(deptId)) {
+      newExpanded.delete(deptId);
+    } else {
+      newExpanded.add(deptId);
+      await loadEquipments(deptId);
+    }
+    setExpandedDepartments(newExpanded);
   };
 
-  const isLoading = (deptId: string): boolean => {
-    return loadingDepartmentDetails[deptId] || false;
-  };
+  useEffect(() => {
+    if (selectedDepartment && !expandedDepartments.has(selectedDepartment.id)) {
+      setExpandedDepartments(prev => new Set([...prev, selectedDepartment.id]));
+      loadEquipments(selectedDepartment.id);
+    }
+  }, [selectedDepartment]);
 
   return (
     <>
@@ -105,75 +109,69 @@ export function DepartmentNav({
               Нет доступных отделов
             </div>
           ) : (
-            departments.map((dept) => {
-              const isExpanded = expandedDepartments.has(dept.id);
-              const equipments = getEquipments(dept.id);
-              const isLoadingEquipments = isLoading(dept.id);
-              
-              return (
-                <div key={dept.id} className="border-b border-gray-100">
-                  <div
-                    className={`flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50 ${
-                      selectedDepartment?.id === dept.id ? 'bg-blue-50' : ''
-                    }`}
-                    onClick={() => handleDepartmentClick(dept)}
-                  >
-                    <div className="flex items-center flex-1">
-                      {isExpanded ? (
-                        <ChevronDown className="w-4 h-4 mr-2 text-gray-400" />
-                      ) : (
-                        <ChevronRight className="w-4 h-4 mr-2 text-gray-400" />
-                      )}
-                      <span className="text-sm font-medium">{dept.name}</span>
-                    </div>
-                    {canCreateEquipment && (
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedDeptForEquipment(dept);
-                          setShowCreateEquipment(true);
-                        }}
-                      >
-                        <Plus className="w-3 h-3" />
-                      </Button>
+            departments.map((dept) => (
+              <div key={dept.id} className="border-b border-gray-100">
+                <div
+                  className={`flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50 ${
+                    selectedDepartment?.id === dept.id ? 'bg-blue-50' : ''
+                  }`}
+                  onClick={() => {
+                    onSelectDepartment(dept);
+                    toggleDepartment(dept.id);
+                  }}
+                >
+                  <div className="flex items-center flex-1">
+                    {expandedDepartments.has(dept.id) ? (
+                      <ChevronDown className="w-4 h-4 mr-2 text-gray-400" />
+                    ) : (
+                      <ChevronRight className="w-4 h-4 mr-2 text-gray-400" />
                     )}
+                    <span className="text-sm font-medium">{dept.name}</span>
                   </div>
-
-                  {isExpanded && (
-                    <div className="ml-6 pb-2">
-                      {isLoadingEquipments ? (
-                        <div className="p-2 text-sm text-gray-400">Загрузка...</div>
-                      ) : equipments.length === 0 ? (
-                        <div className="p-2 text-sm text-gray-400">Нет оборудования</div>
-                      ) : (
-                        equipments.map((equipment) => (
-                          <div
-                            key={equipment.id}
-                            className="p-2 text-sm text-gray-600 hover:bg-gray-50 cursor-pointer rounded flex items-center justify-between"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onSelectEquipment(equipment);
-                            }}
-                          >
-                            <div className="flex items-center gap-2 flex-1 min-w-0">
-                              <StatusBadge statusId={equipment.currentStatusId} size="sm" />
-                              <span className="truncate">{equipment.name}</span>
-                              {equipment.serialNumber && (
-                                <span className="text-xs text-gray-400 flex-shrink-0">
-                                  #{equipment.serialNumber}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        ))
-                      )}
-                    </div>
+                  {canCreateEquipment && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedDeptForEquipment(dept);
+                        setShowCreateEquipment(true);
+                      }}
+                    >
+                      <Plus className="w-3 h-3" />
+                    </Button>
                   )}
                 </div>
-              );
-            })
+
+                {expandedDepartments.has(dept.id) && (
+                  <div className="ml-6 pb-2">
+                    {loadingEquipments[dept.id] ? (
+                      <div className="p-2 text-sm text-gray-400">Загрузка...</div>
+                    ) : equipmentsMap[dept.id]?.length === 0 ? (
+                      <div className="p-2 text-sm text-gray-400">Нет оборудования</div>
+                    ) : (
+                      equipmentsMap[dept.id]?.map((equipment) => (
+                        <div
+                          key={equipment.id}
+                          className="p-2 text-sm text-gray-600 hover:bg-gray-50 cursor-pointer rounded flex items-center justify-between"
+                          onClick={() => onSelectEquipment(equipment)}
+                        >
+                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                            <StatusBadge statusId={equipment.currentStatusId} size="sm" />
+                            <span className="truncate">{equipment.name}</span>
+                            {equipment.serialNumber && (
+                              <span className="text-xs text-gray-400 flex-shrink-0">
+                                #{equipment.serialNumber}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
+              </div>
+            ))
           )}
         </div>
       </div>

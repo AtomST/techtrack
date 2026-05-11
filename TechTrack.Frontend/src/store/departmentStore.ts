@@ -19,15 +19,20 @@ export const useDepartmentStore = create<DepartmentState>((set, get) => ({
   fetchDepartments: async () => {
     set({ loading: true });
     try {
+      // Получаем пользователя из store (уже с ролью)
       const { user } = useAuthStore.getState();
       const role = user?.role;
+      
+      console.log('fetchDepartments - user role:', role);
       
       let departments: Department[] = [];
       
       // Admin или CompanyHead получают все отделы
-      if (role === 'Admin' || role === 'CompanyHead') {
+      if (role === 'Admin' || role === 'CompanyHead' || role === 'PlatformAdmin' || role === 'Dev') {
+        console.log('Using getAllDepartments');
         departments = await departmentService.getAllDepartments();
       } else {
+        console.log('Using getMyDepartments');
         departments = await departmentService.getMyDepartments();
       }
       

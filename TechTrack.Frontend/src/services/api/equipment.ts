@@ -2,7 +2,12 @@ import { apiClient } from './client';
 import { Equipment, Issue, Maintenance } from '@/types';
 
 export const equipmentService = {
-  createEquipment: async (departmentId: string, data: { name: string; description?: string }): Promise<Equipment> => {
+  createEquipment: async (departmentId: string, data: { 
+    name: string; 
+    serialNumber?: string; 
+    description?: string; 
+    responsibleUserId?: string 
+  }): Promise<Equipment> => {
     return apiClient.post(`/departments/${departmentId}/equipments`, data);
   },
 
@@ -10,7 +15,11 @@ export const equipmentService = {
     return apiClient.get(`/departments/${departmentId}/equipments`);
   },
 
-  createIssue: async (equipmentId: string, data: { name: string; description?: string; statusId: number }): Promise<{ issueId: string }> => {
+  createIssue: async (equipmentId: string, data: { 
+    name: string; 
+    description?: string; 
+    statusId: number 
+  }): Promise<{ issueId: string }> => {
     return apiClient.post(`/equipments/${equipmentId}/issues`, data);
   },
 
@@ -18,7 +27,11 @@ export const equipmentService = {
     return apiClient.get(`/equipments/${equipmentId}/issues`);
   },
 
-  createMaintenance: async (equipmentId: string, data: { name: string; description?: string; solvedIssuesId?: string[] }): Promise<void> => {
+  createMaintenance: async (equipmentId: string, data: { 
+    name: string; 
+    description?: string; 
+    solvedIssuesId?: string[] 
+  }): Promise<void> => {
     return apiClient.post(`/equipments/${equipmentId}/maintenance`, data);
   },
 
@@ -26,7 +39,10 @@ export const equipmentService = {
     return apiClient.get(`/equipments/${equipmentId}/maintenance`);
   },
 
-  completeMaintenance: async (maintenanceId: string, data: { description?: string; maintenanceTypeId?: number }): Promise<void> => {
+  completeMaintenance: async (maintenanceId: string, data: { 
+    description?: string; 
+    maintenanceTypeId?: number 
+  }): Promise<void> => {
     return apiClient.post(`/maintenances/${maintenanceId}/complete`, data);
   },
 

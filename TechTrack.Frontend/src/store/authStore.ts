@@ -11,6 +11,19 @@ interface AuthState {
   updateUser: (user: User) => void;
 }
 
+// Функция для извлечения данных из токена
+const parseJwt = (token: string): any => {
+  try {
+    const parts = token.split('.');
+    if (parts.length === 3) {
+      return JSON.parse(atob(parts[1]));
+    }
+  } catch (e) {
+    console.error('Failed to parse JWT:', e);
+  }
+  return null;
+};
+
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
@@ -18,8 +31,22 @@ export const useAuthStore = create<AuthState>()(
       accessToken: null,
       refreshToken: null,
       setAuth: (user, accessToken, refreshToken) => {
-        // Сохраняем только в Zustand store, не дублируем в localStorage
-        set({ user, accessToken, refreshToken });
+        // Извлекаем роль и companyId из токена
+        let userWithRole = user;
+        if (accessToken && !userWithRole?.role) {
+          const payload = parseJwt(accessToken);
+          if (payload) {
+            userWithRole = {
+              id: payload.nameid || user?.id || '',
+              email: user?.email || '',
+              fullName: user?.fullName || '',
+              role: payload.role,
+              companyId: payload.company_id,
+            };
+            console.log('Extracted from token - role:', payload.role, 'companyId:', payload.company_id);
+          }
+        }
+        set({ user: userWithRole, accessToken, refreshToken });
       },
       clearAuth: () => {
         set({ user: null, accessToken: null, refreshToken: null });
@@ -27,7 +54,7 @@ export const useAuthStore = create<AuthState>()(
       updateUser: (user) => set({ user }),
     }),
     {
-      name: 'auth-storage', // Это единственное место хранения
+      name: 'auth-storage',
     }
   )
 );

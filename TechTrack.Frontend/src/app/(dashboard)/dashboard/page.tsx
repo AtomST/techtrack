@@ -4,13 +4,13 @@ import { useState, useEffect } from 'react';
 import { DepartmentNav } from '@/components/layout/DepartmentNav';
 import { IssueList } from '@/components/equipment/IssueList';
 import { MaintenanceLog } from '@/components/equipment/MaintenanceLog';
-import { useCompanyStore } from '@/store/companyStore';
+import { useDepartmentStore } from '@/store/departmentStore';
 import { useEquipmentStore } from '@/store/equipmentStore';
 import { Equipment } from '@/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 
 export default function DashboardPage() {
-  const { departments, fetchDepartments, selectedDepartment, setSelectedDepartment } = useCompanyStore();
+  const { departments, fetchDepartments, selectedDepartment, setSelectedDepartment } = useDepartmentStore();
   const { selectedEquipment, setSelectedEquipment, fetchIssues, fetchMaintenances } = useEquipmentStore();
   const [activeTab, setActiveTab] = useState('issues');
 

@@ -12,15 +12,22 @@ export const useAuth = () => {
   const login = async (email: string, password: string) => {
     try {
       const response = await authService.login({ email, password });
+      console.log('Login response:', response);
       
       if (response && response.accessToken) {
+        // Передаем токен, user может быть null - роль извлечется из токена
         setAuth(response.user || null, response.accessToken, response.refreshToken || '');
         toast.success('Вход выполнен успешно');
-        router.push('/dashboard');
+        
+        // Небольшая задержка перед редиректом
+        setTimeout(() => {
+          router.push('/dashboard');
+        }, 100);
         return true;
       }
       return false;
     } catch (error: any) {
+      console.error('Login error:', error);
       toast.error(error?.message || 'Ошибка входа');
       return false;
     }
