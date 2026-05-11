@@ -55,7 +55,7 @@ namespace TechTrack.UserService.Controllers
         }
 
         [HttpPatch("{userId}/role")]
-        [Authorize(Policy = Policies.CompanyHeadAccess)]
+        [Authorize(Policy = Policies.AdminAccess)]
         public async Task<IActionResult> ChangeUserRole(Guid userId, [FromBody] ChangeRoleRequest request)
         {
             var permissionInfo = new UserPermissionInfo()

@@ -6,6 +6,8 @@ services:
       dockerfile: TechTrack.Backend/TechTrack.ApiGateway/Dockerfile
     ports:
       - "8080:8080"
+    networks:
+      - techtrack-network
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -20,6 +22,8 @@ services:
       RABBITMQ_DEFAULT_PASS: guest
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - techtrack-network
 
 
   postgres-auth:
@@ -32,6 +36,8 @@ services:
       - postgres_auth_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    networks:
+      - techtrack-network
 
   postgres-user:
     image: postgres:15
@@ -43,6 +49,8 @@ services:
       - postgres_user_data:/var/lib/postgresql/data
     ports:
       - "5433:5432"
+    networks:
+      - techtrack-network
 
   postgres-organization:
     image: postgres:15
@@ -54,6 +62,8 @@ services:
       - postgres_organization_data:/var/lib/postgresql/data
     ports:
       - "5434:5432"
+    networks:
+      - techtrack-network
   
   postgres-maintenance:
     image: postgres:15
@@ -65,6 +75,8 @@ services:
       - postgres_maintenance_data:/var/lib/postgresql/data
     ports:
       - "5435:5432"
+    networks:
+      - techtrack-network
 
   postgres-notification:
     image: postgres:15
@@ -76,6 +88,8 @@ services:
       - postgres_notification_data:/var/lib/postgresql/data
     ports:
       - "5436:5432"
+    networks:
+      - techtrack-network
 
   organization-service:
     build:
@@ -88,6 +102,8 @@ services:
       - ConnectionStrings__OrganizationServiceDbConnection=Host=postgres-organization;Database=organization_service;Username=postgres;Password=admin
       - Jwt__AccessTokenKey=5c6dd372771c07a19980ce9ad6f251f3ea8f9974a85a943152a68906a2708f7d
       - Jwt__Issuer=http://auth-service
+    networks:
+      - techtrack-network
     depends_on:
       - postgres-organization
       - rabbitmq
@@ -103,6 +119,8 @@ services:
     environment:
       - ConnectionStrings__AuthServiceDbConnection=Host=postgres-auth;Database=auth_service;Username=postgres;Password=admin
       - Jwt__Issuer=http://auth-service:8080
+    networks:
+      - techtrack-network
     depends_on:
       - postgres-auth
       - rabbitmq
@@ -119,6 +137,8 @@ services:
       - ConnectionStrings__UserServiceDbConnection=Host=postgres-user;Database=user_service;Username=postgres;Password=admin
       - Jwt__Issuer=http://auth-service:8080
       - Jwt__AccessTokenKey=5c6dd372771c07a19980ce9ad6f251f3ea8f9974a85a943152a68906a2708f7d
+    networks:
+      - techtrack-network
     depends_on:
       - postgres-user
       - rabbitmq
@@ -136,6 +156,8 @@ services:
       - ConnectionStrings__Redis=redis-maintenance:6379
       - Jwt__Issuer=http://auth-service:8080
       - Jwt__AccessTokenKey=5c6dd372771c07a19980ce9ad6f251f3ea8f9974a85a943152a68906a2708f7d
+    networks:
+      - techtrack-network
     depends_on:
       - postgres-maintenance
       - rabbitmq
@@ -152,6 +174,8 @@ services:
       - ConnectionStrings__NotificationServiceDbConnection=Host=postgres-notification;Database=notification_service;Username=postgres;Password=admin
       - Jwt__Issuer=http://auth-service:8080
       - Jwt__AccessTokenKey=5c6dd372771c07a19980ce9ad6f251f3ea8f9974a85a943152a68906a2708f7d
+    networks:
+      - techtrack-network
     depends_on:
       - postgres-notification
       - rabbitmq
@@ -165,11 +189,19 @@ services:
       - '3000:3000'
     volumes:
       - frontend_data:/var/lib/frontend/data
+    networks:
+      - techtrack-network
     
   redis-maintenance:
     image: redis:7
     ports:
     - "6379:6379"
+    networks:
+      - techtrack-network
+
+networks:
+  techtrack-network:
+    driver: bridge
 
 volumes:
   frontend_data:
