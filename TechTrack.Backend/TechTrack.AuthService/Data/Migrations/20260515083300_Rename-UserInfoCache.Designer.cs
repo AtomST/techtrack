@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TechTrack.AuthService.Data;
@@ -11,9 +12,11 @@ using TechTrack.AuthService.Data;
 namespace TechTrack.AuthService.Data.Migrations
 {
     [DbContext(typeof(AuthServiceDbContext))]
-    partial class AuthServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260515083300_Rename-UserInfoCache")]
+    partial class RenameUserInfoCache
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

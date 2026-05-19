@@ -14,7 +14,7 @@ namespace TechTrack.AuthService.Data
         }
 
         public DbSet<UserCredentials> UserCredentials { get; set; }
-        public DbSet<UserInfoCache> UserInfoCaches { get; set; }
+        public DbSet<UserInfoCache> UserInfoProjections { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -76,7 +76,7 @@ namespace TechTrack.AuthService.Data
 
             modelBuilder.Entity<UserInfoCache>(entity =>
             {
-                entity.ToTable("user_info_cache");
+                entity.ToTable("user_info_projections");
 
                 entity.HasKey(u => u.UserId);
 

@@ -62,7 +62,7 @@ namespace TechTrack.MaintenanceService.Data
                     .HasColumnName("resolved_by_maintenance_id");
 
                 entity
-                    .HasOne<EquipmentStatus>()
+                    .HasOne<EquipmentStatus>(e => e.EquipmentStatus)
                     .WithMany(e => e.IssuesWithStatus)
                     .HasForeignKey(e => e.StatusId)
                     .OnDelete(DeleteBehavior.Restrict);

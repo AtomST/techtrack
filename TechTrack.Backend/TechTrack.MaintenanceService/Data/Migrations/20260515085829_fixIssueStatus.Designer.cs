@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TechTrack.MaintenanceService.Data;
@@ -11,9 +12,11 @@ using TechTrack.MaintenanceService.Data;
 namespace TechTrack.MaintenanceService.Data.Migrations
 {
     [DbContext(typeof(MaintenanceServiceDbContext))]
-    partial class MaintenanceServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260515085829_fixIssueStatus")]
+    partial class fixIssueStatus
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -477,10 +480,6 @@ namespace TechTrack.MaintenanceService.Data.Migrations
                     b.Property<int>("IntervalValue")
                         .HasColumnType("integer")
                         .HasColumnName("interval_value");
-
-                    b.Property<string>("MaintenanceDescription")
-                        .HasColumnType("text")
-                        .HasColumnName("maintenance_description");
 
                     b.Property<string>("MaintenanceName")
                         .IsRequired()
