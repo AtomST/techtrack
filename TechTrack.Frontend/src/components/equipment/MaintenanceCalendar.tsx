@@ -11,6 +11,27 @@ interface MaintenanceCalendarProps {
   onDateClick?: (date: Date) => void;
 }
 
+// Функция для получения цвета статуса (только визуальное отображение, без логики просрочки)
+const getStatusColor = (statusId: number): string => {
+  switch (statusId) {
+    case 1: return 'bg-green-100 text-green-800 border-green-200';
+    case 2: return 'bg-gray-100 text-gray-800 border-gray-200';
+    case 3: return 'bg-blue-100 text-blue-800 border-blue-200';
+    case 4: return 'bg-red-100 text-red-800 border-red-200';
+    default: return 'bg-gray-100 text-gray-800';
+  }
+};
+
+const getStatusText = (statusId: number): string => {
+  switch (statusId) {
+    case 1: return 'Завершено';
+    case 2: return 'Отменено';
+    case 3: return 'Запланировано';
+    case 4: return 'Просрочено';
+    default: return 'Неизвестно';
+  }
+};
+
 export function MaintenanceCalendar({ maintenances, onDateClick }: MaintenanceCalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -28,26 +49,6 @@ export function MaintenanceCalendar({ maintenances, onDateClick }: MaintenanceCa
       const scheduledDate = new Date(m.scheduledDate);
       return isSameDay(scheduledDate, date);
     });
-  };
-
-  const getStatusColor = (statusId: number) => {
-    switch (statusId) {
-      case 1: return 'bg-green-100 text-green-800 border-green-200';
-      case 2: return 'bg-gray-100 text-gray-800 border-gray-200';
-      case 3: return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 4: return 'bg-red-100 text-red-800 border-red-200';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getStatusText = (statusId: number) => {
-    switch (statusId) {
-      case 1: return 'Завершено';
-      case 2: return 'Отменено';
-      case 3: return 'Запланировано';
-      case 4: return 'Просрочено';
-      default: return 'Неизвестно';
-    }
   };
 
   const prevMonth = () => {

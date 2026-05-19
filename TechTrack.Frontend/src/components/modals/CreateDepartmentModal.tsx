@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/Button';
 import { departmentService } from '@/services/api/departments';
 import { usersService } from '@/services/api/users';
 import { useAuthStore } from '@/store/authStore';
-import { useCompanyStore } from '@/store/companyStore';
+import { useDepartmentStore } from '@/store/departmentStore';
 import toast from 'react-hot-toast';
 
 const schema = z.object({
@@ -30,7 +30,7 @@ export function CreateDepartmentModal({ isOpen, onClose }: CreateDepartmentModal
   const [users, setUsers] = useState<any[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
   const { user } = useAuthStore();
-  const { fetchDepartments } = useCompanyStore();
+  const { fetchDepartments } = useDepartmentStore(); // Используем useDepartmentStore
 
   const {
     register,
@@ -64,7 +64,7 @@ export function CreateDepartmentModal({ isOpen, onClose }: CreateDepartmentModal
     try {
       await departmentService.createDepartment(data);
       toast.success('Отдел создан успешно');
-      await fetchDepartments();
+      await fetchDepartments(); // Теперь это работает
       reset();
       onClose();
     } catch (error: any) {

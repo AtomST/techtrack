@@ -26,9 +26,9 @@ interface CreateIssueModalProps {
 }
 
 const statusOptions = [
-  { id: 1, name: 'Критическая', color: 'bg-red-100 text-red-800 border-red-200', description: 'Требует немедленного вмешательства' },
+  { id: 1, name: 'Низкая', color: 'bg-green-100 text-green-800 border-green-200', description: 'Может быть исправлена позже'  },
   { id: 2, name: 'Средняя', color: 'bg-yellow-100 text-yellow-800 border-yellow-200', description: 'Требует внимания в ближайшее время' },
-  { id: 3, name: 'Низкая', color: 'bg-green-100 text-green-800 border-green-200', description: 'Может быть исправлена позже' },
+  { id: 3, name: 'Критическая', color: 'bg-red-100 text-red-800 border-red-200', description: 'Требует немедленного вмешательства' },
 ];
 
 export function CreateIssueModal({ isOpen, onClose, equipmentId }: CreateIssueModalProps) {

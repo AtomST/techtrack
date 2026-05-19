@@ -91,6 +91,7 @@ export interface Maintenance {
 export interface ScheduleMaintenanceRequest {
   recurrenceTypeId: number;
   maintenanceName: string;
+  maintenanceDescription?: string;
   intervalValue: number;
   nextMaintenanceDate: string;
   responsibleUserId: string;
@@ -155,6 +156,7 @@ export interface MaintenanceSchedule {
   id: string;
   equipmentId: string;
   maintenanceName: string;
+  maintenanceDescription?: string;
   recurrenceTypeId: number;
   intervalValue: number;
   nextMaintenanceDate: string;

@@ -69,7 +69,10 @@ export function CreateEquipmentModal({ isOpen, onClose, departmentId }: CreateEq
     setLoadingUsers(true);
     try {
       let usersList: User[] = [];
+      
+      // Сначала пробуем получить сотрудников отдела
       try {
+        console.log('Loading department employees for:', departmentId);
         const response = await apiClient.get<any>(`/departments/${departmentId}/employees`);
         const data = Array.isArray(response) ? response : response?.data || [];
         usersList = data.map((item: any) => ({
@@ -77,19 +80,27 @@ export function CreateEquipmentModal({ isOpen, onClose, departmentId }: CreateEq
           fullName: item.fullName,
           email: item.email,
         }));
+        console.log('Department employees loaded:', usersList.length);
       } catch (err) {
-        console.log('Failed to get department users, trying company users:', err);
-        const response = await apiClient.get<any>(`/companies/${user?.companyId}/employees`);
-        const data = Array.isArray(response) ? response : response?.data || [];
-        usersList = data.map((item: any) => ({
-          userId: item.userId || item.id,
-          fullName: item.fullName,
-          email: item.email,
-        }));
+        console.log('Failed to get department employees, trying company employees:', err);
+        // Если не получилось, получаем сотрудников компании
+        const companyId = user?.companyId;
+        if (companyId) {
+          const response = await apiClient.get<any>(`/companies/${companyId}/employees`);
+          const data = Array.isArray(response) ? response : response?.data || [];
+          usersList = data.map((item: any) => ({
+            userId: item.userId || item.id,
+            fullName: item.fullName,
+            email: item.email,
+          }));
+          console.log('Company employees loaded:', usersList.length);
+        }
       }
+      
       setUsers(usersList);
     } catch (error) {
       console.error('Failed to load users:', error);
+      toast.error('Не удалось загрузить список пользователей');
     } finally {
       setLoadingUsers(false);
     }

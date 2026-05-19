@@ -29,13 +29,13 @@ const getIssueStatus = (issue: Issue) => {
     };
   }
   switch (issue.statusId) {
-    case 1:
-      return { 
-        label: 'Критическая', 
-        color: 'bg-red-100 text-red-800 border-red-200', 
-        icon: <AlertTriangle className="w-5 h-5 text-red-500" />,
-        order: 0
-      };
+      case 1:
+        return { 
+          label: 'Низкая', 
+          color: 'bg-blue-100 text-blue-800 border-blue-200', 
+          icon: <Info className="w-5 h-5 text-blue-500" />,
+          order: 2
+        };
     case 2:
       return { 
         label: 'Средняя', 
@@ -45,10 +45,10 @@ const getIssueStatus = (issue: Issue) => {
       };
     case 3:
       return { 
-        label: 'Низкая', 
-        color: 'bg-blue-100 text-blue-800 border-blue-200', 
-        icon: <Info className="w-5 h-5 text-blue-500" />,
-        order: 2
+        label: 'Критическая', 
+        color: 'bg-red-100 text-red-800 border-red-200', 
+        icon: <AlertTriangle className="w-5 h-5 text-red-500" />,
+        order: 0
       };
     default:
       return { 

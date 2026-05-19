@@ -21,3 +21,12 @@
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
 }
+@media (max-width: 768px) {
+  .sidebar-collapsed {
+    transform: translateX(-100%);
+  }
+  
+  .sidebar-expanded {
+    transform: translateX(0);
+  }
+}

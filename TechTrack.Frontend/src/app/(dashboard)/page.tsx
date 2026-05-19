@@ -4,13 +4,13 @@ import { useState, useEffect } from 'react';
 import { DepartmentNav } from '@/components/layout/DepartmentNav';
 import { IssueList } from '@/components/equipment/IssueList';
 import { MaintenanceLog } from '@/components/equipment/MaintenanceLog';
-import { useCompanyStore } from '@/store/companyStore';
+import { useDepartmentStore } from '@/store/departmentStore';
 import { useEquipmentStore } from '@/store/equipmentStore';
 import { Equipment } from '@/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 
 export default function DashboardPage() {
-  const { departments, fetchDepartments, selectedDepartment, setSelectedDepartment } = useCompanyStore();
+  const { departments, fetchDepartments, selectedDepartment, setSelectedDepartment } = useDepartmentStore();
   const { selectedEquipment, setSelectedEquipment, fetchIssues, fetchMaintenances } = useEquipmentStore();
   const [activeTab, setActiveTab] = useState('issues');
 
@@ -28,7 +28,7 @@ export default function DashboardPage() {
   const handleEquipmentSelect = (equipment: Equipment) => {
     setSelectedEquipment(equipment);
   };
-  
+
   return (
     <div className="flex h-[calc(100vh-64px)]">
       <DepartmentNav
@@ -51,11 +51,11 @@ export default function DashboardPage() {
                 <TabsTrigger value="issues">Текущие неисправности</TabsTrigger>
                 <TabsTrigger value="maintenance">Журнал ТО</TabsTrigger>
               </TabsList>
-              
+
               <TabsContent value="issues">
                 <IssueList equipmentId={selectedEquipment.id} />
               </TabsContent>
-              
+
               <TabsContent value="maintenance">
                 <MaintenanceLog equipmentId={selectedEquipment.id} />
               </TabsContent>
@@ -68,7 +68,7 @@ export default function DashboardPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
               <h3 className="mt-4 text-lg font-medium text-gray-900">Выберите технику</h3>
-              {/* <p className="mt-1 text-gray-500">Выберите отдел и технику из списка слева</p> */}
+              <p className="mt-1 text-gray-500">Выберите отдел и технику из списка слева</p>
             </div>
           </div>
         )}

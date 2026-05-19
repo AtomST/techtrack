@@ -84,18 +84,10 @@ export function ScheduleMaintenanceModal({ isOpen, onClose, equipmentId }: Sched
     try {
       // Преобразуем локальную дату в UTC
       const localDate = new Date(data.nextMaintenanceDate);
-      const utcDate = new Date(Date.UTC(
-        localDate.getFullYear(),
-        localDate.getMonth(),
-        localDate.getDate(),
-        localDate.getHours(),
-        localDate.getMinutes(),
-        localDate.getSeconds()
-      ));
       
       await scheduleMaintenance(equipmentId, {
         ...data,
-        nextMaintenanceDate: utcDate.toISOString(),
+        nextMaintenanceDate: localDate.toISOString(),
       });
       toast.success('ТО запланировано');
       reset();
@@ -124,7 +116,20 @@ export function ScheduleMaintenanceModal({ isOpen, onClose, equipmentId }: Sched
             <p className="mt-1 text-sm text-red-600">{errors.maintenanceName.message}</p>
           )}
         </div>
-        
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Описание ТО
+          </label>
+          <textarea
+            placeholder="Подробное описание работ..."
+            {...register('maintenanceDescription')}
+            rows={4}
+            className="w-full rounded-lg border border-gray-300 px-4 py-2.5 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Необязательное поле. Рекомендуется указывать состав работ и особые отметки
+          </p>
+        </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -134,15 +139,15 @@ export function ScheduleMaintenanceModal({ isOpen, onClose, equipmentId }: Sched
               className="w-full rounded-lg border border-gray-300 px-4 py-2.5 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
               {...register('recurrenceTypeId', { valueAsNumber: true })}
             >
-              <option value={1}>Ежедневно</option>
-              <option value={2}>Еженедельно</option>
-              <option value={3}>Ежемесячно</option>
+              <option value={1}>День</option>
+              <option value={2}>Неделя</option>
+              <option value={3}>Месяц</option>
             </select>
           </div>
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Интервал
+              Значение
             </label>
             <input
               type="number"
@@ -164,9 +169,6 @@ export function ScheduleMaintenanceModal({ isOpen, onClose, equipmentId }: Sched
             {...register('nextMaintenanceDate')}
             className="w-full rounded-lg border border-gray-300 px-4 py-2.5 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          <p className="text-xs text-gray-500 mt-1">
-            Дата будет автоматически преобразована в UTC при отправке на сервер
-          </p>
           {errors.nextMaintenanceDate && (
             <p className="mt-1 text-sm text-red-600">{errors.nextMaintenanceDate.message}</p>
           )}

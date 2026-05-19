@@ -14,6 +14,7 @@ export default function DashboardLayout({
   const router = useRouter();
   const { accessToken } = useAuthStore();
   const [isClient, setIsClient] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -24,6 +25,20 @@ export default function DashboardLayout({
       router.replace('/login');
     }
   }, [accessToken, router]);
+
+  // Сохраняем состояние сайдбара в localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('sidebarCollapsed');
+    if (saved !== null) {
+      setSidebarCollapsed(saved === 'true');
+    }
+  }, []);
+
+  const handleSidebarToggle = () => {
+    const newState = !sidebarCollapsed;
+    setSidebarCollapsed(newState);
+    localStorage.setItem('sidebarCollapsed', String(newState));
+  };
 
   if (!isClient) {
     return (
@@ -41,8 +56,8 @@ export default function DashboardLayout({
     <div className="min-h-screen bg-gray-50">
       <Header />
       <div className="flex">
-        <Sidebar />
-        <main className="flex-1 overflow-auto">
+        <Sidebar collapsed={sidebarCollapsed} onToggle={handleSidebarToggle} />
+        <main className={`flex-1 overflow-auto transition-all duration-300 ${sidebarCollapsed ? 'ml-0' : 'ml-0'}`}>
           {children}
         </main>
       </div>

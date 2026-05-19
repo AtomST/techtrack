@@ -10,9 +10,10 @@ import { ScheduleMaintenanceModal } from '@/components/modals/ScheduleMaintenanc
 import { CreateMaintenanceModal } from '@/components/modals/CreateMaintenanceModal';
 import { MaintenanceCalendar } from './MaintenanceCalendar';
 import { Calendar, CheckCircle, Clock, Wrench, PlusCircle } from 'lucide-react';
-import { formatDateTime, isOverdue } from '@/utils/dateUtils';
+import { formatDateTime } from '@/utils/dateUtils';
 import toast from 'react-hot-toast';
 
+// Статусы ТО (согласно бекенду)
 const MAINTENANCE_STATUSES: Record<number, { label: string; color: string }> = {
   1: { label: 'Завершено', color: 'green' },
   2: { label: 'Отменено', color: 'gray' },
@@ -20,6 +21,7 @@ const MAINTENANCE_STATUSES: Record<number, { label: string; color: string }> = {
   4: { label: 'Просрочено', color: 'red' },
 };
 
+// Типы ТО
 const MAINTENANCE_TYPES: Record<number, { label: string; color: string }> = {
   1: { label: 'Профилактика', color: 'blue' },
   2: { label: 'Ремонт', color: 'orange' },
@@ -94,6 +96,9 @@ export function MaintenanceLog({ equipmentId }: MaintenanceLogProps) {
       </span>
     );
   };
+
+  // Кнопка "Завершить" показывается для статусов "Запланировано" (3) и "Просрочено" (4)
+  const canComplete = (statusId: number) => statusId === 3 || statusId === 4;
 
   if (loading && maintenances.length === 0) {
     return <div className="text-center py-8">Загрузка...</div>;
@@ -174,12 +179,6 @@ export function MaintenanceLog({ equipmentId }: MaintenanceLogProps) {
                               Выполнено: {formatDateTime(maintenance.completedAt)}
                             </div>
                           )}
-                          {maintenance.maintenanceStatusId === 3 && maintenance.scheduledDate && isOverdue(maintenance.scheduledDate) && (
-                            <div className="flex items-center text-red-600">
-                              <Clock className="w-3 h-3 mr-1" />
-                              Просрочено
-                            </div>
-                          )}
                         </div>
 
                         {maintenance.solvedIssues && maintenance.solvedIssues.length > 0 && (
@@ -196,7 +195,7 @@ export function MaintenanceLog({ equipmentId }: MaintenanceLogProps) {
                         )}
                       </div>
                       
-                      {maintenance.maintenanceStatusId === 3 && (
+                      {canComplete(maintenance.maintenanceStatusId) && (
                         <Button
                           size="sm"
                           variant="primary"
