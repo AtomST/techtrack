@@ -7,13 +7,14 @@ using TechTrack.Shared.Events;
 
 namespace TechTrack.MaintenanceService.Background.Processors
 {
-    public class OverdueMaintenanceProcessor(MaintenanceServiceDbContext dbContext, IPublishEndpoint publishEndpoint) : IBackgroundProcessor
+    public class OverdueMaintenanceProcessor(MaintenanceServiceDbContext dbContext, IPublishEndpoint publishEndpoint, ILogger<OverdueMaintenanceProcessor> logger) : IBackgroundProcessor
     {
         public async Task ProcessAsync(CancellationToken token)
         {
             var now = DateTime.UtcNow;
 
             var items = await dbContext.MaintenanceLog
+                .AsTracking()
                 .Where(m =>
                     m.MaintenanceStatusId == (int)MaintenanceStatusTypes.Scheduled &&
                     m.ScheduledDate < now)
@@ -25,7 +26,7 @@ namespace TechTrack.MaintenanceService.Background.Processors
                 )
                 .Join(
                     dbContext.MaintenanceSchedule,
-                    me => me.m.MaintenanceScheduleRecordId,
+                    me => me.m.MaintenanceScheduleRecordId!.Value,
                     s => s.Id,
                     (me,s) => new
                     {

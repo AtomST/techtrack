@@ -12,13 +12,14 @@ using TechTrack.MaintenanceService.Maintenances.Models;
 using TechTrack.MaintenanceService.Maintenances.Models.Requests;
 using TechTrack.MaintenanceService.Maintenances.Models.Responses;
 using TechTrack.MaintenanceService.Schedule.Models;
+using TechTrack.MaintenanceService.Shared.Interfaces;
 using TechTrack.Shared.Auth;
 using TechTrack.Shared.Events;
 using TechTrack.Shared.Exceptions;
 
 namespace TechTrack.MaintenanceService.Maintenances.Implementations
 {
-    public class MaintenanceLogic(MaintenanceServiceDbContext dbContext, IPublishEndpoint publishEndpoint, ILogger<MaintenanceLogic> logger) : IMaintenanceLogic
+    public class MaintenanceLogic(MaintenanceServiceDbContext dbContext, IPublishEndpoint publishEndpoint, ILogger<MaintenanceLogic> logger, IUserDepartmentLogic userDepartmentLogic) : IMaintenanceLogic
     {
         public async Task<AddMaintenanceResponse> AddMaintenance(AddMaintenanceRequest request, UserPermissionInfo userInfo)
         {
@@ -202,6 +203,32 @@ namespace TechTrack.MaintenanceService.Maintenances.Implementations
             }
 
             return nextMaintenanceDate;
+        }
+
+        public async Task<GetAllDepartmentMaintenancesResponse> GetAllDepartmentMaintenances(Guid departmentId, UserPermissionInfo userInfo)
+        {
+            logger.LogInformation(userInfo.Role);
+            if(userInfo.Role != Roles.CompanyHead && userInfo.Role != Roles.Admin)
+            {
+                var userDepartmentLogicResponse = await userDepartmentLogic.GetUserDepartmentIds(userInfo.UserId);
+                var userDepartments = userDepartmentLogicResponse.ToHashSet();
+
+                if (!userDepartments.Contains(departmentId))
+                    throw new ForbiddenException("У вас нет доступа к журналу ТО этого отдела.");
+            }
+
+            var maintenanceLog = await dbContext.EquipmentsProjection
+                .AsNoTracking()
+                .Where(e => e.DepartmentId == departmentId)
+                .Join(
+                    dbContext.MaintenanceLog,
+                    e => e.Id,
+                    m => m.EquipmentId,
+                    (e, m) => m
+               )
+            .ToListAsync();
+
+            return new GetAllDepartmentMaintenancesResponse { MaintenanceLog = maintenanceLog };
         }
     }
 }

@@ -11,6 +11,7 @@ using TechTrack.MaintenanceService.Projections.Implementations;
 using TechTrack.MaintenanceService.Projections.Interfaces;
 using TechTrack.MaintenanceService.Schedule.Implementations;
 using TechTrack.MaintenanceService.Schedule.Interfaces;
+using TechTrack.MaintenanceService.Shared.EventHandlers;
 using TechTrack.MaintenanceService.Shared.Implementations;
 using TechTrack.MaintenanceService.Shared.Interfaces;
 using TechTrack.Shared.Auth;
@@ -58,6 +59,9 @@ namespace TechTrack.MaintenanceService
 
             builder.Services.AddMassTransit(x =>
             {
+                x.AddConsumer<UserDepartmentAddedHandler>();
+                x.AddConsumer<UserDepartmentRemovedHandler>();
+                x.AddConsumer<EquipmentAddedEventHandler>();
                 x.AddEntityFrameworkOutbox<MaintenanceServiceDbContext>(c =>
                 {
                     c.UsePostgres();
@@ -69,6 +73,18 @@ namespace TechTrack.MaintenanceService
                     {
                         h.Username(builder.Configuration["RabbitMQ:Username"]);
                         h.Password(builder.Configuration["RabbitMQ:Password"]);
+                    });
+                    cfg.ReceiveEndpoint("maintenance.equipment-added", c =>
+                    {
+                        c.ConfigureConsumer<EquipmentAddedEventHandler>(context);
+                    });
+                    cfg.ReceiveEndpoint("maintenance.user-department-added", c =>
+                    {
+                        c.ConfigureConsumer<UserDepartmentAddedHandler>(context);
+                    });
+                    cfg.ReceiveEndpoint("maintenance.user-department-remove", c =>
+                    {
+                        c.ConfigureConsumer<UserDepartmentRemovedHandler>(context);
                     });
                 });
             });

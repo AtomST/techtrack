@@ -9,5 +9,6 @@ namespace TechTrack.MaintenanceService.Maintenances.Interfaces
         public Task<AddMaintenanceResponse> AddMaintenance(AddMaintenanceRequest maintenance, UserPermissionInfo userInfo);
         public Task<GetMaintenanceLogByEquipmentIdResponse> GetMaintenanceLogByEquipment(Guid equipmentId, UserPermissionInfo userInfo);
         public Task CompleteMaintenanceAsync(CompleteMaintenanceRequest request, UserPermissionInfo userInfo);
+        public Task<GetAllDepartmentMaintenancesResponse> GetAllDepartmentMaintenances(Guid departmentId, UserPermissionInfo userInfo);
     }
 }

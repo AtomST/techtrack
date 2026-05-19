@@ -6,6 +6,7 @@ namespace TechTrack.MaintenanceService.Schedule.Models.Requests
     {
         public Guid EquipmentId { get; set; }
         public string MaintenanceName { get; set; }
+        public string? MaintenanceDescription { get; set; }
         public int RecurrenceTypeId { get; set; }
         public int IntervalValue { get; set; }
         public DateTime NextMaintenanceDate { get; set; }

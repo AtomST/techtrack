@@ -56,5 +56,18 @@ namespace TechTrack.MaintenanceService.Maintenances
                 StatusCode = System.Net.HttpStatusCode.OK
             });
         }
+        [HttpGet]
+        [Route("~/api/departments/{departmentId}/maintenances")]
+        [Authorize(Policy = Policies.ManagementAccess)]
+        public async Task<IActionResult> GetAllDepartmentMaintenances(Guid departmentId)
+        {
+
+            var response = await maintenanceLogic.GetAllDepartmentMaintenances(departmentId, User.GetPrincipalInfo());
+            return Ok(new SuccessResponse
+            {
+                StatusCode = System.Net.HttpStatusCode.OK,
+                Data = response.MaintenanceLog
+            });
+        }
     }
 }

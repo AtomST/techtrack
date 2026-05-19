@@ -13,7 +13,7 @@ namespace TechTrack.MaintenanceService.Background
             {
                 using var scope = serviceProvider.CreateScope();
 
-                var processors = serviceProvider
+                var processors = scope.ServiceProvider
                     .GetServices<IBackgroundProcessor>()
                     .ToList();
 
@@ -24,7 +24,6 @@ namespace TechTrack.MaintenanceService.Background
 
                 await Task.Delay(_interval, stoppingToken);
             }
-
         }
     }
 }

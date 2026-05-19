@@ -31,6 +31,7 @@ namespace TechTrack.MaintenanceService.Schedule.Implementations
             {
                 EquipmentId = request.EquipmentId,
                 MaintenanceName = request.MaintenanceName,
+                MaintenanceDescription = request.MaintenanceDescription,
                 NotificationAdvanceDays = request.NotificationAdvanceDays,
                 IntervalValue = request.IntervalValue,
                 NextMaintenanceDate = request.NextMaintenanceDate,
@@ -46,6 +47,7 @@ namespace TechTrack.MaintenanceService.Schedule.Implementations
                 MaintenanceTypeId = (int)MaintenanceTypes.Preventive,
                 ScheduledDate = scheduleRecord.NextMaintenanceDate,
                 Name = request.MaintenanceName,
+                Description = request.MaintenanceDescription,
                 EquipmentId = request.EquipmentId,
                 ResponsibleUserId = request.ResponsibleUserId
             };
