@@ -1,4 +1,5 @@
 ﻿using MassTransit;
+using MassTransit.Initializers;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
 using TechTrack.OrganizationService.Data;
@@ -8,6 +9,7 @@ using TechTrack.OrganizationService.Equipments.Models.Requests;
 using TechTrack.OrganizationService.Equipments.Models.Responses;
 using TechTrack.Shared.Auth;
 using TechTrack.Shared.Equipment;
+using TechTrack.Shared.Events;
 using TechTrack.Shared.Exceptions;
 
 namespace TechTrack.OrganizationService.Equipments.Logic.Implementations
@@ -21,9 +23,17 @@ namespace TechTrack.OrganizationService.Equipments.Logic.Implementations
             _dbContext = dbContext;
             _publishEndpoint = publishEndpoint;
         }
-        public async Task<AddEquipmentResponse> AddEquipmentAsync(Guid departmentId, AddEquipmentRequest request)
+        public async Task<AddEquipmentResponse> AddEquipmentAsync(Guid departmentId, AddEquipmentRequest request, UserPermissionInfo userInfo)
         {
             var defaultStatus = (int)EquipmentStatusCode.Green;
+            var departmentCompanyId = await _dbContext.Departments
+                .AsNoTracking().
+                Where(x => x.Id == departmentId)
+                .Select(x => x.CompanyId)
+                .FirstOrDefaultAsync();
+
+            if (departmentCompanyId != userInfo.CompanyId)
+                throw new ForbiddenException("У вас нет доступа к этому отделу.");
 
             var existingNames =
                 await _dbContext.Equipments
@@ -47,10 +57,19 @@ namespace TechTrack.OrganizationService.Equipments.Logic.Implementations
                 CurrentStatusId = defaultStatus
             };
 
+            
+
             await _dbContext.AddAsync(equipment);
             await _dbContext.SaveChangesAsync();
 
-            
+            await _publishEndpoint.Publish(new EquipmentAddedEvent
+            {
+                EquipmentId = equipment.Id,
+                CompanyId = departmentCompanyId,
+                DepartmentId = departmentId,
+                Name = equipment.Name,
+                ResponsibleUserId = equipment.ResponsibleUserId
+            });
 
             return new AddEquipmentResponse { EquipmentId = equipment.Id };
         }

@@ -6,7 +6,7 @@ namespace TechTrack.OrganizationService.Equipments.Logic.Interfaces
 {
     public interface IEquipmentsLogic
     {
-        public Task<AddEquipmentResponse> AddEquipmentAsync(Guid departmentId, AddEquipmentRequest request);
+        public Task<AddEquipmentResponse> AddEquipmentAsync(Guid departmentId, AddEquipmentRequest request, UserPermissionInfo userInfo);
         public Task<GetAllEquipmentsResponse> GetAllEquipmentsAsync(Guid departmentId, UserPermissionInfo userPermissionInfo);
     }
 }

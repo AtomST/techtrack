@@ -10,7 +10,7 @@ using TechTrack.Shared.Responses;
 namespace TechTrack.OrganizationService.Equipments
 {
     [ApiController]
-    [Route("api/companies/{companyId}/departments/{departmentId}/[controller]")]
+    [Route("api/departments/{departmentId}/[controller]")]
     public class EquipmentsController : ControllerBase
     {
         private readonly IEquipmentsLogic _equipmentsLogic;
@@ -21,12 +21,10 @@ namespace TechTrack.OrganizationService.Equipments
         }
 
         [HttpPost]
-        [Authorize(Policy = Policies.CompanyHeadAccess)]
-        public async Task<IActionResult> AddEquipment(Guid companyId, Guid departmentId, AddEquipmentRequest request)
+        [Authorize(Policy = Policies.AdminAccess)]
+        public async Task<IActionResult> AddEquipment(Guid departmentId, AddEquipmentRequest request)
         {
-            User.AdditionalPolicyValidation(companyId);
-
-            var response = await _equipmentsLogic.AddEquipmentAsync(departmentId, request);
+            var response = await _equipmentsLogic.AddEquipmentAsync(departmentId, request, User.GetPrincipalInfo());
 
             return CreatedAtRoute(
                 "",
@@ -41,10 +39,8 @@ namespace TechTrack.OrganizationService.Equipments
 
         [HttpGet]
         [Authorize(Policy = Policies.EmployeeAccess)]
-        public async Task<IActionResult> GetEquipments(Guid companyId, Guid departmentId)
+        public async Task<IActionResult> GetEquipments(Guid departmentId)
         {
-            User.AdditionalPolicyValidation(companyId);
-
             var response = await _equipmentsLogic.GetAllEquipmentsAsync(departmentId, User.GetPrincipalInfo());
 
             return Ok(new SuccessResponse
