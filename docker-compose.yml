@@ -1,11 +1,12 @@
-version: '3.8'
+version: "3.8"
+
 services:
   api-gateway:
     build:
       context: .
       dockerfile: TechTrack.Backend/TechTrack.ApiGateway/Dockerfile
     ports:
-      - "8080:8080"
+      - "${API_GATEWAY_PORT}:8080"
     networks:
       - techtrack-network
 
@@ -16,78 +17,77 @@ services:
     expose:
       - "5672"
     ports:
-      - "15672:15672"
+      - "${RABBITMQ_MANAGEMENT_PORT}:15672"
     environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     networks:
       - techtrack-network
 
-
   postgres-auth:
     image: postgres:15
     environment:
-      POSTGRES_DB: auth_service
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: ${AUTH_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_auth_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "${AUTH_DB_PORT}:5432"
     networks:
       - techtrack-network
 
   postgres-user:
     image: postgres:15
     environment:
-      POSTGRES_DB: user_service
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: ${USER_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_user_data:/var/lib/postgresql/data
     ports:
-      - "5433:5432"
+      - "${USER_DB_PORT}:5432"
     networks:
       - techtrack-network
 
   postgres-organization:
     image: postgres:15
     environment:
-      POSTGRES_DB: organization_service
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: ${ORGANIZATION_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_organization_data:/var/lib/postgresql/data
     ports:
-      - "5434:5432"
+      - "${ORGANIZATION_DB_PORT}:5432"
     networks:
       - techtrack-network
-  
+
   postgres-maintenance:
     image: postgres:15
     environment:
-      POSTGRES_DB: maintenance_service
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: ${MAINTENANCE_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_maintenance_data:/var/lib/postgresql/data
     ports:
-      - "5435:5432"
+      - "${MAINTENANCE_DB_PORT}:5432"
     networks:
       - techtrack-network
 
   postgres-notification:
     image: postgres:15
     environment:
-      POSTGRES_DB: notification_service
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: ${NOTIFICATION_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_notification_data:/var/lib/postgresql/data
     ports:
-      - "5436:5432"
+      - "${NOTIFICATION_DB_PORT}:5432"
     networks:
       - techtrack-network
 
@@ -99,32 +99,32 @@ services:
       - "8080"
       - "8081"
     environment:
-      - ConnectionStrings__OrganizationServiceDbConnection=Host=postgres-organization;Database=organization_service;Username=postgres;Password=admin
-      - Jwt__AccessTokenKey=5c6dd372771c07a19980ce9ad6f251f3ea8f9974a85a943152a68906a2708f7d
-      - Jwt__Issuer=http://auth-service
-    networks:
-      - techtrack-network
+      ConnectionStrings__OrganizationServiceDbConnection: Host=postgres-organization;Database=${ORGANIZATION_DB_NAME};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      Jwt__Issuer: ${JWT_ISSUER}
+      Jwt__AccessTokenKey: ${JWT_ACCESS_TOKEN_KEY}
     depends_on:
       - postgres-organization
       - rabbitmq
       - api-gateway
+    networks:
+      - techtrack-network
 
   auth-service:
     build:
       context: .
       dockerfile: TechTrack.Backend/TechTrack.AuthService/Dockerfile
     expose:
-      - "8080" # REST(HTTP/1.1)
-      - "8081" # gRPC(HTTP/2)
+      - "8080"
+      - "8081"
     environment:
-      - ConnectionStrings__AuthServiceDbConnection=Host=postgres-auth;Database=auth_service;Username=postgres;Password=admin
-      - Jwt__Issuer=http://auth-service:8080
-    networks:
-      - techtrack-network
+      ConnectionStrings__AuthServiceDbConnection: Host=postgres-auth;Database=${AUTH_DB_NAME};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      Jwt__Issuer: ${JWT_ISSUER}
     depends_on:
       - postgres-auth
       - rabbitmq
       - api-gateway
+    networks:
+      - techtrack-network
 
   user-service:
     build:
@@ -134,15 +134,15 @@ services:
       - "8080"
       - "8081"
     environment:
-      - ConnectionStrings__UserServiceDbConnection=Host=postgres-user;Database=user_service;Username=postgres;Password=admin
-      - Jwt__Issuer=http://auth-service:8080
-      - Jwt__AccessTokenKey=5c6dd372771c07a19980ce9ad6f251f3ea8f9974a85a943152a68906a2708f7d
-    networks:
-      - techtrack-network
+      ConnectionStrings__UserServiceDbConnection: Host=postgres-user;Database=${USER_DB_NAME};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      Jwt__Issuer: ${JWT_ISSUER}
+      Jwt__AccessTokenKey: ${JWT_ACCESS_TOKEN_KEY}
     depends_on:
       - postgres-user
       - rabbitmq
       - api-gateway
+    networks:
+      - techtrack-network
 
   maintenance-service:
     build:
@@ -152,16 +152,16 @@ services:
       - "8080"
       - "8081"
     environment:
-      - ConnectionStrings__MaintenanceServiceDbConnection=Host=postgres-maintenance;Database=maintenance_service;Username=postgres;Password=admin
-      - ConnectionStrings__Redis=redis-maintenance:6379
-      - Jwt__Issuer=http://auth-service:8080
-      - Jwt__AccessTokenKey=5c6dd372771c07a19980ce9ad6f251f3ea8f9974a85a943152a68906a2708f7d
-    networks:
-      - techtrack-network
+      ConnectionStrings__MaintenanceServiceDbConnection: Host=postgres-maintenance;Database=${MAINTENANCE_DB_NAME};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      ConnectionStrings__Redis: redis-maintenance:6379
+      Jwt__Issuer: ${JWT_ISSUER}
+      Jwt__AccessTokenKey: ${JWT_ACCESS_TOKEN_KEY}
     depends_on:
       - postgres-maintenance
       - rabbitmq
       - api-gateway
+    networks:
+      - techtrack-network
 
   notification-service:
     build:
@@ -171,31 +171,31 @@ services:
       - "8080"
       - "8081"
     environment:
-      - ConnectionStrings__NotificationServiceDbConnection=Host=postgres-notification;Database=notification_service;Username=postgres;Password=admin
-      - Jwt__Issuer=http://auth-service:8080
-      - Jwt__AccessTokenKey=5c6dd372771c07a19980ce9ad6f251f3ea8f9974a85a943152a68906a2708f7d
-    networks:
-      - techtrack-network
+      ConnectionStrings__NotificationServiceDbConnection: Host=postgres-notification;Database=${NOTIFICATION_DB_NAME};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      Jwt__Issuer: ${JWT_ISSUER}
+      Jwt__AccessTokenKey: ${JWT_ACCESS_TOKEN_KEY}
     depends_on:
       - postgres-notification
       - rabbitmq
       - api-gateway
+    networks:
+      - techtrack-network
 
   frontend:
     build:
       context: TechTrack.Frontend
       dockerfile: Dockerfile
     ports:
-      - '3000:3000'
+      - "${FRONTEND_PORT}:3000"
     volumes:
       - frontend_data:/var/lib/frontend/data
     networks:
       - techtrack-network
-    
+
   redis-maintenance:
     image: redis:7
     ports:
-    - "6379:6379"
+      - "${REDIS_PORT}:6379"
     networks:
       - techtrack-network
 
