@@ -19,7 +19,7 @@ TechTrack — это веб-сервис, предназначенный для 
 
 ## Архитектура системы
 
-<img width="1158" height="501" alt="TechTrackBackendStructure" src="https://github.com/user-attachments/assets/c079fb4a-2c0b-4d04-8e95-5cef33c8af3e" />
+<img width="1162" height="502" alt="TechTrackBackendStructure2" src="https://github.com/user-attachments/assets/3237476d-02bc-400f-b44f-b21510b2a5c2" />
 
 ## Диаграмма основных вариантов использования
 
