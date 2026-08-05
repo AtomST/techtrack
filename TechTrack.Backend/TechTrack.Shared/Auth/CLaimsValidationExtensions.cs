@@ -21,13 +21,13 @@ namespace TechTrack.Shared.Auth
             {
                 UserId = Guid.Parse(userId),
                 Role = userRole,
-                CompanyId = companyIdFromToken,
+                CompanyId = Guid.Parse(companyIdFromToken),
             };
         }
 
         private static void ValidateUserPermission(UserPermissionInfo userPermissionInfo, Guid companyId)
         {
-            if (companyId.ToString() != userPermissionInfo.CompanyId
+            if (companyId != userPermissionInfo.CompanyId
                 && userPermissionInfo.Role != Roles.Dev
                 && userPermissionInfo.Role != Roles.PlatformAdmin)
             {

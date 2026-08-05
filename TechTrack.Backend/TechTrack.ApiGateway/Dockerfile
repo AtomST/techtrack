@@ -2,8 +2,8 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # Copy both projects
-COPY TechTrack.Shared/ ./TechTrack.Shared/
-COPY TechTrack.ApiGateway/ ./TechTrack.ApiGateway/
+COPY TechTrack.Backend/TechTrack.Shared/ ./TechTrack.Shared/
+COPY TechTrack.Backend/TechTrack.ApiGateway/ ./TechTrack.ApiGateway/
 
 # Build with correct paths
 RUN dotnet build "TechTrack.ApiGateway/TechTrack.ApiGateway.csproj" -c http

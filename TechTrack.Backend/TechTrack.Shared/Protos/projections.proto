@@ -1,0 +1,26 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "TechTrack.Shared.Protos";
+
+package projections;
+
+service ProjectionService{
+	rpc GetDepartmentEquipments(GetDepartmentEquipmentsRequest) returns (GetDepartmentEquipmentsResponse);
+}
+
+message GetDepartmentEquipmentsRequest{
+	string user_id = 1;
+	string user_role = 2;
+	string department_id = 3;
+}
+
+message Equipment{
+	string id = 1;
+	string name = 2;
+}
+
+message GetDepartmentEquipmentsResponse{
+	repeated Equipment equipments = 1;
+	string company_id = 2;
+	string department_id = 3;
+}

@@ -5,5 +5,6 @@
         public string Name { get; set; }
         public string SerialNumber { get; set; }
         public string? Desctiption { get; set; }
+        public Guid? ResponsibleUserId { get; set; }
     }
 }

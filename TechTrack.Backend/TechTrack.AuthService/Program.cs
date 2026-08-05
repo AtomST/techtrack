@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication;
 using TechTrack.AuthService.Configuration;
 using TechTrack.AuthService.Data;
 using TechTrack.AuthService.Logic.EventHandlers;
+using TechTrack.AuthService.Logic.gRPC;
 using TechTrack.AuthService.Logic.Implementations;
 using TechTrack.AuthService.Logic.Interfaces;
 using TechTrack.Shared.Logic;
@@ -44,18 +45,18 @@ namespace TechTrack.AuthService
                         h.Password(builder.Configuration["RabbitMQ:Password"]);
                     });
 
-                    cfg.ReceiveEndpoint("role-changed", e =>
+                    cfg.ReceiveEndpoint("auth.role-changed", e =>
                     {
                         e.AutoDelete = false;
                         e.ConfigureConsumer<UserRoleChangedHandler>(context);
                     });
 
-                    cfg.ReceiveEndpoint("company-changed", e =>
+                    cfg.ReceiveEndpoint("auth.company-changed", e => 
                     {
                         e.AutoDelete = false;
                         e.ConfigureConsumer<UserCompanyChangedHandler>(context);
                     });
-                    cfg.ReceiveEndpoint("company-registered-withowner", e =>
+                    cfg.ReceiveEndpoint("auth.company-registered-withowner", e =>
                     {
                         e.AutoDelete = false;
                         e.ConfigureConsumer<CompanyRegisteredWithOwnerHandler>(context);
@@ -68,7 +69,6 @@ namespace TechTrack.AuthService
             builder.Services.Configure<SecurityOptions>(builder.Configuration.GetSection("Security"));
 
             var app = builder.Build();
-            app.MapGrpcService<UserRoleChangedHandler>();
             app.UseMiddleware<GlobalExceptionHandler>();
 
             app.MapControllers();

@@ -95,7 +95,7 @@ namespace TechTrack.AuthService.Data.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("user_info_cache", (string)null);
+                    b.ToTable("user_info_projections", (string)null);
                 });
 
             modelBuilder.Entity("TechTrack.AuthService.Data.Entities.RefreshToken", b =>

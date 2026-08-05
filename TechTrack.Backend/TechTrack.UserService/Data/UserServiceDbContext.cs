@@ -31,6 +31,10 @@ namespace TechTrack.UserService.Data
                 entity.Property(e => e.Id)
                     .ValueGeneratedNever();
 
+                entity.Property(e => e.Email)
+                    .IsRequired()
+                    .HasColumnName("email");
+
                 entity.Property(e => e.FullName)
                     .HasColumnName("full_name");
 

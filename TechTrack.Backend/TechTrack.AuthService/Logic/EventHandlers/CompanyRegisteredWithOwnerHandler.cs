@@ -17,7 +17,7 @@ namespace TechTrack.AuthService.Logic.EventHandlers
         public async Task Consume(ConsumeContext<CompanyRegisteredWithOwner> context)
         {
             var message = context.Message;
-            var userCache = _dbContext.UserInfoCaches.FirstOrDefault(u => u.UserId == message.UserId);
+            var userCache = _dbContext.UserInfoProjections.FirstOrDefault(u => u.UserId == message.UserId);
 
             userCache.CompanyId = message.CompanyId;
             await _dbContext.SaveChangesAsync();

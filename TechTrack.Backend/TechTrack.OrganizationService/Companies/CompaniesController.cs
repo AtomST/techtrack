@@ -39,6 +39,19 @@ namespace TechTrack.OrganizationService.Companies
             });
         }
 
+        [HttpPost("{companyId:guid}/employees")]
+        [Authorize(Policy = Policies.ManagementAccess)]
+        public async Task<IActionResult> AddEmployeeByEmail(Guid companyId, [FromBody] AddEmployeeByEmailRequest request)
+        {
+            User.AdditionalPolicyValidation(companyId);
+
+            await _companiesLogic.AddEmployeeByEmailAsync(request, companyId);
+            return Ok(new SuccessResponse
+            {
+                StatusCode = System.Net.HttpStatusCode.OK
+            });
+        }
+
         //[HttpGet("my")]
         //[Authorize(Roles = Policies.EmployeeAccess)]
         //public async Task<IActionResult> GetCompanyById()
@@ -47,5 +60,18 @@ namespace TechTrack.OrganizationService.Companies
 
         //    return CreatedAtAction
         //}
+        [HttpGet("{companyId:guid}/employees")]
+        [Authorize(Policies.AdminAccess)]
+        public async Task<IActionResult> GetEmployees(Guid companyId)
+        {
+            User.AdditionalPolicyValidation(companyId);
+
+            var response = await _companiesLogic.GetAllEmployees(companyId, User.GetPrincipalInfo());
+            return Ok(new SuccessResponse
+            {
+                StatusCode = System.Net.HttpStatusCode.OK,
+                Data = response
+            });
+        }
     }
 }

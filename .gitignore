@@ -1,0 +1,12 @@
+﻿################################################################################
+# Данный GITIGNORE-файл был автоматически создан Microsoft(R) Visual Studio.
+################################################################################
+
+/TechTrackBackendStructure.png
+/TechTrackBackendStructure.drawio
+/TechTrack.Frontend3
+/TechTrack.Frontend4
+/TechTrack.Frontend/.next
+/TechTrack.Frontend/node_modules
+/TechTrackBackendStructure.svg
+/M.pgerd

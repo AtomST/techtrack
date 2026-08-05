@@ -2,6 +2,7 @@
 using TechTrack.OrganizationService.Companies.Entities;
 using TechTrack.OrganizationService.Departments.Entities;
 using TechTrack.OrganizationService.Equipments.Entities;
+using TechTrack.OrganizationService.UserProjections.Entities;
 
 namespace TechTrack.OrganizationService.Data
 {
@@ -15,17 +16,18 @@ namespace TechTrack.OrganizationService.Data
 
         public DbSet<Company> Companies { get; set; }
         public DbSet<CompanyUser> CompanyUser { get; set; }
-        public DbSet<EquipmentStatus> EquipmentStatuses { get; set; }
         public DbSet<Department> Departments { get; set; }
-        public DbSet<DepartmentUser> UserDepartments { get; set; }
+        public DbSet<DepartmentUser> DepartmentUsers { get; set; }
         public DbSet<Equipment> Equipments { get; set; }
+        public DbSet<UserProjection> UserProjections { get; set; }
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseNpgsql(_configuration.GetConnectionString("OrganizationServiceDbConnection"));
+                optionsBuilder.UseNpgsql(_configuration.GetConnectionString("OrganizationServiceDbConnection"))
+                    .UseSnakeCaseNamingConvention();
             }
         }
 
@@ -100,28 +102,11 @@ namespace TechTrack.OrganizationService.Data
                     .HasColumnName("current_status_id");
             });
 
-            modelBuilder.Entity<EquipmentStatus>(entity =>
-            {
-                entity.ToTable("equipment_status");
-
-                entity.Property(e => e.Id)
-                    .HasColumnName("id");
-                entity.Property(e => e.Name)
-                    .HasColumnName("name");
-                entity.Property(e => e.Description)
-                    .HasColumnName("description");
-
-                entity
-                    .HasMany<Equipment>()
-                    .WithOne(e => e.EquipmentStatus)
-                    .HasForeignKey(e => e.CurrentStatusId);
-            });
-
             modelBuilder.Entity<DepartmentUser>(entity =>
             {
                 entity.ToTable("department_user");
 
-                entity.HasKey(e => e.UserId);
+                entity.HasKey(e => new {e.UserId, e.DepartmentId});
 
                 entity.Property(p => p.UserId)
                     .HasColumnName("user_id")

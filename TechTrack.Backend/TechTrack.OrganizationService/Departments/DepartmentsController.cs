@@ -10,7 +10,7 @@ using TechTrack.Shared.Responses;
 namespace TechTrack.OrganizationService.Departments
 {
     [ApiController]
-    [Route("api/companies/{companyId}/[controller]")]
+    [Route("api/[controller]")]
     public class DepartmentsController : ControllerBase
     {
         private readonly IDepartmentsLogic _departmentsLogic;
@@ -22,34 +22,53 @@ namespace TechTrack.OrganizationService.Departments
 
         [HttpPost]
         [Authorize(Policy = Policies.CompanyHeadAccess)]
-        public async Task<IActionResult> CreateDepartment(Guid companyId, CreateDepartmentRequest request)
+        public async Task<IActionResult> CreateDepartment(CreateDepartmentRequest request)
         {
-            User.AdditionalPolicyValidation(companyId);
-
-            var response = await _departmentsLogic.CreateDepartmentAsync(companyId, request);
-            return Created();
+            var response = await _departmentsLogic.CreateDepartmentAsync(request, User.GetPrincipalInfo());
+            return Ok(new SuccessResponse
+            {
+                StatusCode = System.Net.HttpStatusCode.Created,
+                Data = response
+            });
         }
 
         [HttpGet]
-        [Authorize(Policy = Policies.CompanyHeadAccess)]
-        public async Task<IActionResult> GetAllDepartments(Guid companyId)
+        [Authorize(Policy = Policies.AdminAccess)]
+        public async Task<IActionResult> GetAllDepartments()
         {
-            User.AdditionalPolicyValidation(companyId);
-
-            var response = await _departmentsLogic.GetAllDepartmentsAsync(companyId);
+            var response = await _departmentsLogic.GetAllDepartmentsAsync(User.GetPrincipalInfo());
             return Ok(new SuccessResponse
             {
                 StatusCode = System.Net.HttpStatusCode.OK,
                 Data = response.Departments
             });
         }
+        [HttpGet("my")]
+        [Authorize(Policy = Policies.EmployeeAccess)]
+        public async Task<IActionResult> GetAllUserDepartmentsAsync()
+        {
+            var response = await _departmentsLogic.GetAllUserDepartmentsAsync(User.GetPrincipalInfo());
+            return Ok(new SuccessResponse
+            {
+                StatusCode = System.Net.HttpStatusCode.OK,
+                Data = response.Departments
+            });
+        }
+        [HttpPost("{departmentId}/employees")]
+        [Authorize(Policy = Policies.ManagementAccess)]
+        public async Task<IActionResult> AddEmployeeById(Guid departmentId, AddEmployeeByIdRequest request)
+        {
+            await _departmentsLogic.AddEmployeeByIdAsync(departmentId, User.GetPrincipalInfo(), request);
 
+            return Ok(new SuccessResponse
+            {
+                StatusCode = System.Net.HttpStatusCode.OK
+            });
+        }
         [HttpGet("{departmentId}")]
         [Authorize(Policy = Policies.EmployeeAccess)]
-        public async Task<IActionResult> GetFullDepartmentInfoById(Guid companyId,Guid departmentId)
+        public async Task<IActionResult> GetFullDepartmentInfoById(Guid departmentId)
         {
-            User.AdditionalPolicyValidation(companyId);
-
             var response = await _departmentsLogic.GetFullDepartmentInfoAsync(
                 departmentId,
                 User.GetPrincipalInfo()
@@ -62,6 +81,17 @@ namespace TechTrack.OrganizationService.Departments
             });
         }
 
+        [HttpGet("{departmentId}/employees")]
+        [Authorize(Policy = Policies.ManagementAccess)]
+        public async Task<IActionResult> GetAllDepartmentEmployees(Guid departmentId)
+        {
+            var response = await _departmentsLogic.GetAllDepartmentEmployees(departmentId, User.GetPrincipalInfo());
+            return Ok(new SuccessResponse
+            {
+                StatusCode = System.Net.HttpStatusCode.OK,
+                Data = response
+            });
+        }
 
     }
 }

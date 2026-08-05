@@ -14,16 +14,16 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.9" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.9" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Configuration\" />
-  </ItemGroup>
-
-  <ItemGroup>
 	<Protobuf Include="Protos/roles.proto" GrpcServices="Both" />
 	<Protobuf Include="Protos/company_user.proto" GrpcServices="Both" />
+	<ProtoBuf Include="Protos/projections.proto" GrpcService="Both" />
+	<ProtoBuf Include="Protos/user_departments.proto" GrpcService="Both" />
+	<ProtoBuf Include="Protos/user_id.proto" GrpcService="Both" />
   </ItemGroup>
 </Project>

@@ -38,7 +38,7 @@ namespace TechTrack.AuthService.Logic.Implementations
                 {
                     //var grpcResponse = await _roleServiceClient.GetUserRoleAsync(new GetRoleRequest { UserId = userId.ToString()});
                     //userRole = grpcResponse.UserRole;
-                    var cache = await _dbContext.UserInfoCaches.FindAsync(userId);
+                    var cache = await _dbContext.UserInfoProjections.FindAsync(userId);
                     if (cache is null)
                         _logger.LogWarning($"В базе есть UserCredentials, но нет UserInfoCache. UserId: {userId}");
 

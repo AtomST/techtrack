@@ -13,7 +13,6 @@ namespace TechTrack.Shared.Auth
         public const string CompanyHeadAccess = "CompanyHeadAccess";
         public const string AdminAccess = "AdminAccess";
         public const string ManagementAccess = "ManagementAccess";
-        public const string SupervisorAccess = "SupervisorAccess";
         public const string EmployeeAccess = "EmployeeAccess";
     }
 }

@@ -89,6 +89,7 @@ namespace TechTrack.AuthService.Logic.Implementations
             await _publishEndpoint.Publish(new UserCreatedEvent
             {
                 Id = userCredentials.Id,
+                Email = userCredentials.Email,
                 Name = registerDto.FullName,
                 PhoneNumber = registerDto.PhoneNumber,
                 CreatedAt = DateTime.UtcNow

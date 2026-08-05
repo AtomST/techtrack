@@ -15,7 +15,7 @@ namespace TechTrack.AuthService.Logic.EventHandlers
         public async Task Consume(ConsumeContext<UserRoleChanged> context)
         {
             var message = context.Message;
-            var userCache = _dbContext.UserInfoCaches.FirstOrDefault(u => u.UserId == message.Id);
+            var userCache = _dbContext.UserInfoProjections.FirstOrDefault(u => u.UserId == message.Id);
 
             userCache.RoleName = message.RoleName;
             await _dbContext.SaveChangesAsync();

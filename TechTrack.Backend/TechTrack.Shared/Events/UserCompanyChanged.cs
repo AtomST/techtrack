@@ -9,6 +9,6 @@ namespace TechTrack.Shared.Events
     public class UserCompanyChanged
     {
         public Guid UserId { get; set; }
-        public Guid CompanyId { get; set; }
+        public Guid? CompanyId { get; set; }
     }
 }
